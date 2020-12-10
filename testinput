@@ -1,5 +1,7 @@
-DECLARE
-    a,b
+DECLARE [ XDDDD ]
+    a, b(9:10)
 BEGIN
     a:=2;
+    WRITE a;
+    b:=2+2;
 END
