@@ -1,1 +1,1 @@
-# Simple-Compilator
+# Simple-Compiler
