@@ -1,6 +1,9 @@
 DECLARE [ XDDDD ]
-    b, b
+    a,b
 BEGIN
-    b:=2+2;
-    b:=2+1;
+    b:=2;
+    b:=3;
+    b:=12312;
+    a:=3;
+    b:=12312 + 23123;
 END

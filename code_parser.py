@@ -131,24 +131,30 @@ def p_declarations_muliple(p):
     if symbol_exists(p[3]):
         throw_redeclare_error(p,3)
 
-
 def p_declarations_single_var(p):
     'declarations : pidentifier'
 
     if symbol_exists(p[1]):
         throw_redeclare_error(p,1)
     p[0] = p[1]
-    symbols.append(Symbol(p[1]))
+
+    symbol = Symbol(p[1])
+    symbol.set_address(code_generator.get_data_offset())
+    symbols.append(symbol)
 
 def p_declarations_single_tab(p):
     'declarations : pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'
     if symbol_exists(p[1]):
         throw_redeclare_error(p,1)
     p[0] = p[1]
-    symbols.append(Symbol(p[1]))
+
+    symbol = Symbol(p[1])
+    symbol.set_address(code_generator.get_data_offset())
+    symbols.append(symbol)
+
 
 def throw_redeclare_error(p, index):
-    print("[Error] Line: [" + str(p.lineno(1)) + "]  | Symbol redeclared! [" + str(p[index]) + "]")
+    print("[Error] Line: [" + str(p.lineno(1)) + "] | Symbol redeclared! [" + str(p[index]) + "]")
     exit(-1)
 
 def p_commands(p):
@@ -166,8 +172,7 @@ def p_command(p):
                | WRITE  value SEMICOLON'''
 
     if p[2] == ":=":
-        #exchange variable at pidentifier's address
-        code_generator.store_variable(p[3], 'a')
+        code_generator.store_value_at_address(p[3], get_symbol_address(p[1]))
 
 def p_expression(p):
     '''expression : value
@@ -176,7 +181,20 @@ def p_expression(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
-    p[0] = p[1]
+
+    if len(p) == 2:
+        p[0] = p[1]
+    elif p[2] == '+':
+        p[0] = p[1] + p[3]
+    elif p[2] == '-':
+        p[0] = p[1] - p[3]
+    elif p[2] == '*':
+        p[0] = p[1] * p[3]
+    elif p[2] == '/':
+        p[0] = p[1] // p[3]
+    elif p[2] == '%':
+        p[0] = p[1] % p[3]
+
 
 def p_condition(p):
     '''condition : value EQUALS value
@@ -201,15 +219,6 @@ def p_identifier(p):
 def p_error(p):
     print("[Błąd składni]")
 
-def get_lexer():
-    return lexer
-
-def get_parser():
-    return parser
-
-def get_code_generator():
-    return code_generator
-
 lexer = lex.lex()
 parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
@@ -220,3 +229,17 @@ def symbol_exists(pidentifier):
         if pidentifier == symbol.get_pidentifier():
             return True
     return False
+
+def get_symbol_address(pidentifier):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier():
+            return symbol.get_address()
+
+def get_lexer():
+    return lexer
+
+def get_parser():
+    return parser
+
+def get_code_generator():
+    return code_generator

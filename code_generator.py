@@ -4,6 +4,7 @@ class CodeGenerator():
         self.registers = ['a', 'b', 'c', 'd', 'e', 'f']
         self.current_data_offset = 0
         self.generated_code = ""
+        self.last_stored_var_addr = ""
 
     # Math
     def add(self, var_a, var_b):
@@ -39,17 +40,36 @@ class CodeGenerator():
             self.generated_code += "INC f\n"
 
     def store_variable(self, var_a, reg):
+        self.generated_code += "RESET " + str(reg) + "\n"
+        current_val = 0
+
+        while(current_val != var_a):
+            current_val +=1
+            self.generated_code += "INC " + str(reg) + "\n"
+        
+        self.generate_offset()
+        self.generated_code += "STORE " + str(reg) + " f\n"
+        self.last_stored_var_addr = self.current_data_offset
+
+    def get_generated_code(self):
+        self.generated_code+="HALT"
+        return self.generated_code
+
+    def store_value_at_address(self, var_a, address):
         self.generated_code += "RESET a\n"
         current_val = 0
 
         while(current_val != var_a):
             current_val +=1
             self.generated_code += "INC a\n"
+
+        self.generated_code += "RESET f\n"
+        address_val = 0
+
+        while(address_val != address):
+            address_val +=1
+            self.generated_code += "INC f\n"
+
+        self.generated_code += "STORE a f\n"
+
         
-        self.generate_offset()
-        self.generated_code += "STORE " + str(reg) + " f\n"
-
-    def get_generated_code(self):
-        self.generated_code+="HALT"
-        return self.generated_code
-
