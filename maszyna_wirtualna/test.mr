@@ -1,0 +1,8 @@
+RESET a
+RESET b
+INC a
+INC b
+ADD a b
+STORE a b
+PUT b
+HALT

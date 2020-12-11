@@ -1,7 +1,8 @@
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
-import symbol_table as sym_tab
+from symbol import Symbol
+from code_generator import CodeGenerator
 
 tokens = (
     "READ",
@@ -120,17 +121,35 @@ def t_error(t):
     print("Invalid Token:",t.value[0])
     t.lexer.skip(1)
 
-start = 'program'
-
 def p_program(p):
     '''program : DECLARE declarations BEGIN commands END
                | BEGIN commands END'''
 
-def p_declarations(p):
+def p_declarations_muliple(p):
     '''declarations : declarations COMMA pidentifier
-                    | declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET
-                    | pidentifier
-                    | pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'''
+                    | declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'''
+    if symbol_exists(p[3]):
+        throw_redeclare_error(p,3)
+
+
+def p_declarations_single_var(p):
+    'declarations : pidentifier'
+
+    if symbol_exists(p[1]):
+        throw_redeclare_error(p,1)
+    p[0] = p[1]
+    symbols.append(Symbol(p[1]))
+
+def p_declarations_single_tab(p):
+    'declarations : pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'
+    if symbol_exists(p[1]):
+        throw_redeclare_error(p,1)
+    p[0] = p[1]
+    symbols.append(Symbol(p[1]))
+
+def throw_redeclare_error(p, index):
+    print("[Error] Line: [" + str(p.lineno(1)) + "]  | Symbol redeclared! [" + str(p[index]) + "]")
+    exit(-1)
 
 def p_commands(p):
     '''commands : commands command
@@ -146,6 +165,10 @@ def p_command(p):
                | READ  identifier SEMICOLON
                | WRITE  value SEMICOLON'''
 
+    if p[2] == ":=":
+        #exchange variable at pidentifier's address
+        code_generator.store_variable(p[3], 'a')
+
 def p_expression(p):
     '''expression : value
                   | value ADD value
@@ -153,6 +176,7 @@ def p_expression(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
+    p[0] = p[1]
 
 def p_condition(p):
     '''condition : value EQUALS value
@@ -165,18 +189,34 @@ def p_condition(p):
 def p_value(p):
     '''value : NUM
              | identifier'''
-            
+    p[0] = p[1]
+
 def p_identifier(p):
     '''identifier : pidentifier
                   | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
                   | pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'''
+    p[0] = p[1]
+    symbols.append(Symbol(p[1]))
 
 def p_error(p):
     print("[Błąd składni]")
 
 def get_lexer():
-    return lex.lex()
+    return lexer
 
 def get_parser():
-    return yacc.yacc()
+    return parser
 
+def get_code_generator():
+    return code_generator
+
+lexer = lex.lex()
+parser = yacc.yacc(start='program')
+code_generator = CodeGenerator()
+symbols = []
+
+def symbol_exists(pidentifier):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier():
+            return True
+    return False

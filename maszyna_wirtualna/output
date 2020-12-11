@@ -1,0 +1,8 @@
+RESET a
+INC a
+INC a
+RESET f
+INC f
+STORE a f
+PUT f
+HALT

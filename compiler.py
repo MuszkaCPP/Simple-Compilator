@@ -1,4 +1,4 @@
-import code_parser as parser
+import code_parser
 import sys
 
 if __name__ == "__main__":
@@ -13,8 +13,9 @@ if __name__ == "__main__":
         exit(-1)
 
     try:
-        lexer = parser.get_lexer()
-        parser = parser.get_parser()
+        lexer = code_parser.get_lexer()
+        parser = code_parser.get_parser()
+        code_generator = code_parser.get_code_generator()
     except:
         print("[ERROR] Failed to initialize parser")
         exit(-1)
@@ -23,4 +24,6 @@ if __name__ == "__main__":
         for line in file:
             _input += line
 
-    res = parser.parse(_input)
+    res = parser.parse(_input, tracking=True)
+    with open(output_file,'w') as file:
+        file.writelines(code_generator.get_generated_code())
