@@ -8,9 +8,11 @@ class Symbol():
         if(is_tab):
             self.is_tab = True
             self.start_address = self.address
-            self.end_address = self.start_address + (end_index - start_index + 1)
+            self.end_address = self.start_address + (end_index - start_index)
             self.length = self.end_address - self.start_address + 1
             self.tab_offset = start_index
+
+            print("Start:" + str(self.start_address) + " " + str(self.end_address)+ " "+ str(self.length) + "\n")
 
     def set_address(self, address):
         self.address = address
@@ -21,8 +23,11 @@ class Symbol():
     def get_pidentifier(self):
         return self.pidentifier
 
-    def get_tab_offeset(self):
+    def get_tab_offset(self):
         return self.tab_offset
+    
+    def get_tab_length(self):
+        return self.length
 
 
             

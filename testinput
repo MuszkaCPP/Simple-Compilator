@@ -1,8 +1,16 @@
 DECLARE [ XDDDD ]
-    tab(10:100)
+    tab(10:100),tabb(0:10), a, b
 BEGIN
     tab(11):=1;
     tab(12):=10;
-    tab(100):=100;
-    tab(101):=100;
+    tab(99):=100;
+    tabb(0):=123123;
+    a:= 1;
+    b:= 3;
+    WRITE a;
+    WRITE b;
+    WRITE tab(12);
+    WRITE tab(11);
+    WRITE tab(99);
+    WRITE tabb(0);
 END

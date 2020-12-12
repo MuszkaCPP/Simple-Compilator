@@ -132,7 +132,7 @@ def p_declarations_muliple(p):
     if symbol_exists(p[3]):
         throw_redeclare_error(p,3)
     if len(p) == 4:
-        symbol = Symbol(p[3])
+        symbol = Symbol(p[3], code_generator.get_data_offset())
     else:
         symbol = Symbol(p[3], code_generator.get_data_offset(), True, p[5], p[7])
     symbols.append(symbol)
@@ -143,7 +143,7 @@ def p_declarations_single_var(p):
         throw_redeclare_error(p,1)
     p[0] = p[1]
 
-    symbol = Symbol(p[1])
+    symbol = Symbol(p[1], code_generator.get_data_offset())
     symbol.set_address(code_generator.get_data_offset())
     symbols.append(symbol)
 
@@ -155,6 +155,7 @@ def p_declarations_single_tab(p):
 
     symbol = Symbol(p[1], code_generator.get_data_offset(), True, p[3], p[5])
     symbols.append(symbol)
+    code_generator.increase_data_offset(symbol.get_tab_length())
 
 def throw_redeclare_error(p, index):
     print("[Error] Line: [" + str(p.lineno(1)) + "] | Symbol redeclared! [" + str(p[index]) + "]")
@@ -163,7 +164,7 @@ def throw_redeclare_error(p, index):
 def p_commands(p):
     '''commands : commands command
                 | command'''
-def p_command(p):
+def p_command_all(p):
     '''command : identifier ASSIGNMENT expression SEMICOLON
                | IF condition THEN commands ELSE commands ENDIF
                | IF  condition  THEN  commands  ENDIF
@@ -171,14 +172,25 @@ def p_command(p):
                | REPEAT  commands  UNTIL  condition SEMICOLON
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR
-               | READ  identifier SEMICOLON
-               | WRITE  value SEMICOLON'''
+               | READ  identifier SEMICOLON'''
+    global tab_index
     if p[2] == ":=":
         if(is_tab(p[1])):
-            code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index_assignment), 'a')
-            #code_generator.get_value_by_adress(get_symbol_address(p[1], tab_index_assignment))
+            code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index), 'a')
         else:
             code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
+def p_command_write(p):
+    'command : WRITE value SEMICOLON'
+
+    global tab_index
+    if(symbol_exists(p[2])):
+        if is_tab(p[2]):
+            code_generator.get_value_by_adress('f',get_symbol_address(p[2], tab_index), True)
+        else:
+            code_generator.get_value_by_adress('f',get_symbol_address(p[2]), True)
+    else:
+        #jesli to bedzie liczba
+        pass
 
 def p_expression(p):
     '''expression : value
@@ -222,8 +234,9 @@ def p_identifier(p):
 
 def p_identifier_tab(p):
     'identifier : pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'
+    global tab_index
     p[0] = p[1]
-    tab_index_assignment = p[3]
+    tab_index = p[3]
 
 def p_error(p):
     print("[Błąd składni]")
@@ -232,7 +245,7 @@ lexer = lex.lex()
 parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
 symbols = []
-tab_index_assignment = 0
+tab_index = 0
 
 def symbol_exists(pidentifier):
     for symbol in symbols:
@@ -257,7 +270,7 @@ def is_tab(pidentifier):
 
 def print_all_symbols():
     for symbol in symbols:
-        print(str(symbol.pidentifier) + "\n")
+        print(str(symbol.pidentifier) + "  " + str(symbol.get_address()) +"\n")
 
 def get_lexer():
     return lexer

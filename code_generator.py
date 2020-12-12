@@ -25,20 +25,24 @@ class CodeGenerator():
     def get_data_offset(self):
         self.current_data_offset += 1 
         return self.current_data_offset
+
+    def increase_data_offset(self, offset):
+        self.current_data_offset += offset
     
-    def get_value_by_adress(self, address):
-        self.generated_code += "RESET f\n"
+    def get_value_by_adress(self, reg, address, print="False"):
+        self.generated_code += "RESET " + str(reg) +"\n"
         address_val = 0
 
         while(address_val != address):
             if(address_val > 0 and address_val*2 <= address):
                 address_val *= 2
-                self.generated_code += "SHL f\n"
+                self.generated_code += "SHL " + str(reg) +"\n"
             else:
                 address_val += 1
-                self.generated_code += "INC f\n"
-                
-        self.generated_code += "PUT f\n"
+                self.generated_code += "INC " + str(reg) +"\n"
+        
+        if(print):
+            self.generated_code += "PUT " + str(reg) +"\n"
 
     def generate_offset(self):
         self.generated_code += "RESET f\n"
@@ -95,10 +99,10 @@ class CodeGenerator():
 
         self.generated_code += "STORE " + str(reg) + " f\n"
 
-    def store_tab():
+    def store_tab(self,):
         pass
 
-    def get_tab_elem_by_index(tab, index):
+    def get_tab_elem_by_index(self,tab, index):
         #Check if index is closer to start address
         if( tab.start_address + index < tab.end_address - index):
             pass
