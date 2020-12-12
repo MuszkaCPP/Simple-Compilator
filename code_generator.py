@@ -44,8 +44,12 @@ class CodeGenerator():
         current_val = 0
 
         while(current_val != var_a):
-            current_val +=1
-            self.generated_code += "INC " + str(reg) + "\n"
+            if(current_val > 0 and current_val*2 <= var_a):
+                current_val *= 2
+                self.generated_code += "SHL" + str(reg) + "\n"
+            else:
+                current_val += 1
+                self.generated_code += "INC " + str(reg) + "\n"
         
         self.generate_offset()
         self.generated_code += "STORE " + str(reg) + " f\n"
@@ -55,21 +59,37 @@ class CodeGenerator():
         self.generated_code+="HALT"
         return self.generated_code
 
-    def store_value_at_address(self, var_a, address):
+    def store_value_at_address(self, var_a, address, reg):
         self.generated_code += "RESET a\n"
         current_val = 0
 
         while(current_val != var_a):
-            current_val +=1
-            self.generated_code += "INC a\n"
+            if(current_val > 0 and current_val*2 <= var_a):
+                current_val *= 2
+                self.generated_code += "SHL " + str(reg) + "\n"
+            else:
+                current_val += 1
+                self.generated_code += "INC " + str(reg) + "\n"
 
         self.generated_code += "RESET f\n"
         address_val = 0
 
         while(address_val != address):
-            address_val +=1
-            self.generated_code += "INC f\n"
+            if(address_val > 0 and address_val*2 <= address):
+                address_val *= 2
+                self.generated_code += "SHL f\n"
+            else:
+                address_val += 1
+                self.generated_code += "INC f\n"
 
-        self.generated_code += "STORE a f\n"
+        self.generated_code += "STORE " + str(reg) + " f\n"
+
+    def store_tab():
+        pass
+
+    def get_tab_elem_by_index(tab, index):
+        #Check if index is closer to start address
+        if( tab.start_address + index < tab.end_address - index):
+            pass
 
         

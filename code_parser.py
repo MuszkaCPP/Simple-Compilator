@@ -128,9 +128,14 @@ def p_program(p):
 def p_declarations_muliple(p):
     '''declarations : declarations COMMA pidentifier
                     | declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'''
+
     if symbol_exists(p[3]):
         throw_redeclare_error(p,3)
-
+    if len(p) == 4:
+        symbol = Symbol(p[3])
+    else:
+        symbol = Symbol(p[3], code_generator.get_data_offset(), True, p[5], p[7])
+    symbols.append(symbol)
 def p_declarations_single_var(p):
     'declarations : pidentifier'
 
@@ -148,10 +153,8 @@ def p_declarations_single_tab(p):
         throw_redeclare_error(p,1)
     p[0] = p[1]
 
-    symbol = Symbol(p[1])
-    symbol.set_address(code_generator.get_data_offset())
+    symbol = Symbol(p[1], code_generator.get_data_offset(), True, p[3], p[5])
     symbols.append(symbol)
-
 
 def throw_redeclare_error(p, index):
     print("[Error] Line: [" + str(p.lineno(1)) + "] | Symbol redeclared! [" + str(p[index]) + "]")
@@ -170,9 +173,11 @@ def p_command(p):
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR
                | READ  identifier SEMICOLON
                | WRITE  value SEMICOLON'''
-
     if p[2] == ":=":
-        code_generator.store_value_at_address(p[3], get_symbol_address(p[1]))
+        if(is_tab(p[1])):
+            code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index_assignment), 'a')
+        else:
+            code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
 
 def p_expression(p):
     '''expression : value
@@ -211,10 +216,13 @@ def p_value(p):
 
 def p_identifier(p):
     '''identifier : pidentifier
-                  | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-                  | pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'''
+                  | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET'''
     p[0] = p[1]
-    symbols.append(Symbol(p[1]))
+
+def p_identifier_tab(p):
+    'identifier : pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'
+    p[0] = p[1]
+    tab_index_assignment = p[3]
 
 def p_error(p):
     print("[Błąd składni]")
@@ -223,6 +231,7 @@ lexer = lex.lex()
 parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
 symbols = []
+tab_index_assignment = 0
 
 def symbol_exists(pidentifier):
     for symbol in symbols:
@@ -230,10 +239,24 @@ def symbol_exists(pidentifier):
             return True
     return False
 
-def get_symbol_address(pidentifier):
+def get_symbol_address(pidentifier, offset=0):
     for symbol in symbols:
         if pidentifier == symbol.get_pidentifier():
-            return symbol.get_address()
+            if(symbol.is_tab):
+                return symbol.get_address() + offset
+            else:
+                return symbol.get_address()
+
+def is_tab(pidentifier):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier() and symbol.is_tab:
+            return True
+
+        return False    
+
+def print_all_symbols():
+    for symbol in symbols:
+        print(str(symbol.pidentifier) + "\n")
 
 def get_lexer():
     return lexer
