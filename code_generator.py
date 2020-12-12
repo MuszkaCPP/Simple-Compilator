@@ -28,21 +28,18 @@ class CodeGenerator():
 
     def increase_data_offset(self, offset):
         self.current_data_offset += offset
-    
-    def get_value_by_adress(self, reg, address, print="False"):
-        self.generated_code += "RESET " + str(reg) +"\n"
-        address_val = 0
 
-        while(address_val != address):
-            if(address_val > 0 and address_val*2 <= address):
-                address_val *= 2
-                self.generated_code += "SHL " + str(reg) +"\n"
+    def generate_number_at_reg(self, var_a, reg):
+        self.generated_code += "RESET " + str(reg) + "\n"
+        current_val = 0
+
+        while(current_val != var_a):
+            if(current_val > 0 and current_val*2 <= var_a):
+                current_val *= 2
+                self.generated_code += "SHL " + str(reg) + "\n"
             else:
-                address_val += 1
-                self.generated_code += "INC " + str(reg) +"\n"
-        
-        if(print):
-            self.generated_code += "PUT " + str(reg) +"\n"
+                current_val += 1
+                self.generated_code += "INC " + str(reg) + "\n"
 
     def generate_offset(self):
         self.generated_code += "RESET f\n"
@@ -55,52 +52,35 @@ class CodeGenerator():
             self.generated_code += "INC f\n"
 
     def store_variable(self, var_a, reg):
-        self.generated_code += "RESET " + str(reg) + "\n"
-        current_val = 0
-
-        while(current_val != var_a):
-            if(current_val > 0 and current_val*2 <= var_a):
-                current_val *= 2
-                self.generated_code += "SHL" + str(reg) + "\n"
-            else:
-                current_val += 1
-                self.generated_code += "INC " + str(reg) + "\n"
-        
+        self.generate_number_at_reg(var_a, reg)
         self.generate_offset()
         self.generated_code += "STORE " + str(reg) + " f\n"
+
+    def store_value_at_address(self, var_a, address, reg):
+        self.generate_number_at_reg(var_a, reg)
+        self.generate_number_at_reg(address, 'f')
+        self.generated_code += "STORE " + str(reg) + " f\n"
+
         self.last_stored_var_addr = self.current_data_offset
+
+    def store_value_from_reg_at_address(self, address, reg):
+        self.generate_number_at_reg(address, 'a')
+        self.generated_code += "LOAD c " + str(reg) + "\n"
+        self.generated_code += "STORE c a\n"
 
     def get_generated_code(self):
         self.generated_code+="HALT"
         return self.generated_code
 
-    def store_value_at_address(self, var_a, address, reg):
-        self.generated_code += "RESET a\n"
-        current_val = 0
+    def print_value_from_adress(self, reg, address, _print="False"):
+        self.generate_number_at_reg(address, reg)
 
-        while(current_val != var_a):
-            if(current_val > 0 and current_val*2 <= var_a):
-                current_val *= 2
-                self.generated_code += "SHL " + str(reg) + "\n"
-            else:
-                current_val += 1
-                self.generated_code += "INC " + str(reg) + "\n"
+        if(_print):
+            self.generated_code += "PUT " + str(reg) +"\n"
 
-        self.generated_code += "RESET f\n"
-        address_val = 0
-
-        while(address_val != address):
-            if(address_val > 0 and address_val*2 <= address):
-                address_val *= 2
-                self.generated_code += "SHL f\n"
-            else:
-                address_val += 1
-                self.generated_code += "INC f\n"
-
-        self.generated_code += "STORE " + str(reg) + " f\n"
-
-    def store_tab(self,):
-        pass
+    def print_value_from_register(self, var_a, reg):
+        self.generate_number_at_reg(var_a, reg)
+        self.generate_offset()
 
     def get_tab_elem_by_index(self,tab, index):
         #Check if index is closer to start address

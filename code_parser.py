@@ -74,7 +74,7 @@ t_LEQ = r'<='
 t_GEQ = r'>='
 
 #ignore
-t_ignore_RUBBISH = r'[ \n]+'
+t_ignore_RUBBISH = r'[ \t\n]+'
 t_ignore_COMMENT = r'\[.*\]'
 
 #Number, pidentifier
@@ -135,7 +135,9 @@ def p_declarations_muliple(p):
         symbol = Symbol(p[3], code_generator.get_data_offset())
     else:
         symbol = Symbol(p[3], code_generator.get_data_offset(), True, p[5], p[7])
+        code_generator.increase_data_offset(symbol.get_tab_length()-1)
     symbols.append(symbol)
+
 def p_declarations_single_var(p):
     'declarations : pidentifier'
 
@@ -155,7 +157,7 @@ def p_declarations_single_tab(p):
 
     symbol = Symbol(p[1], code_generator.get_data_offset(), True, p[3], p[5])
     symbols.append(symbol)
-    code_generator.increase_data_offset(symbol.get_tab_length())
+    code_generator.increase_data_offset(symbol.get_tab_length()-1)
 
 def throw_redeclare_error(p, index):
     print("[Error] Line: [" + str(p.lineno(1)) + "] | Symbol redeclared! [" + str(p[index]) + "]")
@@ -173,24 +175,33 @@ def p_command_all(p):
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR
                | READ  identifier SEMICOLON'''
+
     global tab_index
+    #Naprawic przypisanie ze zmienna po prawej stronie
     if p[2] == ":=":
-        if(is_tab(p[1])):
+        if(is_tab(p[1]) and not symbol_exists(p[3])):
             code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index), 'a')
+        elif(is_tab(p[1]) and symbol_exists(p[3])):
+            #print(get_symbol_address(p[3], tab_index))
+            code_generator.print_value_from_adress('b', get_symbol_address(p[3]), False)
+            address = get_symbol_address(p[1], tab_index)
+            code_generator.store_value_from_reg_at_address(address, 'b')
         else:
             code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
+
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
     global tab_index
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
-            code_generator.get_value_by_adress('f',get_symbol_address(p[2], tab_index), True)
+            #print(get_symbol_address(p[2], tab_index))
+            code_generator.print_value_from_adress('f', get_symbol_address(p[2], tab_index), True)
         else:
-            code_generator.get_value_by_adress('f',get_symbol_address(p[2]), True)
+            code_generator.print_value_from_adress('f', get_symbol_address(p[2]), True)
     else:
-        #jesli to bedzie liczba
-        pass
+        code_generator.store_variable(p[2], 'a')
+        code_generator.print_value_from_adress('f', code_generator.current_data_offset)
 
 def p_expression(p):
     '''expression : value
@@ -212,7 +223,6 @@ def p_expression(p):
         p[0] = p[1] // p[3]
     elif p[2] == '%':
         p[0] = p[1] % p[3]
-
 
 def p_condition(p):
     '''condition : value EQUALS value
@@ -245,6 +255,7 @@ lexer = lex.lex()
 parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
 symbols = []
+constants = {}
 tab_index = 0
 
 def symbol_exists(pidentifier):
@@ -266,7 +277,7 @@ def is_tab(pidentifier):
         if pidentifier == symbol.get_pidentifier() and symbol.is_tab:
             return True
 
-        return False    
+    return False    
 
 def print_all_symbols():
     for symbol in symbols:

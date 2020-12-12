@@ -1,16 +1,37 @@
-DECLARE [ XDDDD ]
-    tab(10:100),tabb(0:10), a, b
+[ numbers.imp - liczby ]
+DECLARE
+	a, b, c, t(0:6), d, e, f, g, h, i, j, tab(0:5)
 BEGIN
-    tab(11):=1;
-    tab(12):=10;
-    tab(99):=100;
-    tabb(0):=123123;
-    a:= 1;
-    b:= 3;
-    WRITE a;
-    WRITE b;
-    WRITE tab(12);
-    WRITE tab(11);
-    WRITE tab(99);
-    WRITE tabb(0);
+	WRITE 0;
+	WRITE 1;
+	WRITE 2;
+	WRITE 10;
+	WRITE 100;
+	WRITE 10000;
+	WRITE 12345;
+
+	a := 1234;
+	b := 6777;
+	c := 15;
+	t(2) := 5555;
+	d := 8888;
+	tab(4) := 11;
+	t(0) := 999;
+	e := 1111;
+	tab(0) := 7777;
+	f := 2048;
+	g := 123;
+	t(3) := 3;
+	tab(5) := a;
+	t(5) := 1;
+	tab(0):= 100;
+
+	WRITE c; [ c = 15 ]
+	WRITE t(3); [ 3 ]
+	WRITE t(2); [ 5555 ]
+	WRITE t(5); [ 1 ]
+	WRITE t(0); [ 999 ]
+	WRITE tab(4); [ 11 ]
+	WRITE tab(5); [ 1234 ]
+	WRITE tab(0); [ 100 ]
 END
