@@ -26,8 +26,19 @@ class CodeGenerator():
         self.current_data_offset += 1 
         return self.current_data_offset
     
-    def get_value_by_adress(self):
-        pass
+    def get_value_by_adress(self, address):
+        self.generated_code += "RESET f\n"
+        address_val = 0
+
+        while(address_val != address):
+            if(address_val > 0 and address_val*2 <= address):
+                address_val *= 2
+                self.generated_code += "SHL f\n"
+            else:
+                address_val += 1
+                self.generated_code += "INC f\n"
+                
+        self.generated_code += "PUT f\n"
 
     def generate_offset(self):
         self.generated_code += "RESET f\n"

@@ -176,6 +176,7 @@ def p_command(p):
     if p[2] == ":=":
         if(is_tab(p[1])):
             code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index_assignment), 'a')
+            #code_generator.get_value_by_adress(get_symbol_address(p[1], tab_index_assignment))
         else:
             code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
 

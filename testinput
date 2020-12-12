@@ -1,7 +1,8 @@
 DECLARE [ XDDDD ]
-    tab(10:100), a
+    tab(10:100)
 BEGIN
     tab(11):=1;
-    a:=125;
-    tab(11):=10;
+    tab(12):=10;
+    tab(100):=100;
+    tab(101):=100;
 END
