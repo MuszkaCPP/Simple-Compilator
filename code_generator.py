@@ -31,15 +31,21 @@ class CodeGenerator():
 
     def generate_number_at_reg(self, var_a, reg):
         self.generated_code += "RESET " + str(reg) + "\n"
-        current_val = 0
+        bin_var = bin(var_a)[2:]
+        first_digit = bin_var[0]
+        bin_var = bin(var_a)[3:]
 
-        while(current_val != var_a):
-            if(current_val > 0 and current_val*2 <= var_a):
-                current_val *= 2
+        if first_digit == '1':
+            self.generated_code += "INC " + str(reg) + "\n"
+        else:
+            return
+
+        for digit in bin_var:
+            if digit == '1':
                 self.generated_code += "SHL " + str(reg) + "\n"
-            else:
-                current_val += 1
                 self.generated_code += "INC " + str(reg) + "\n"
+            else:
+                self.generated_code += "SHL " + str(reg) + "\n"
 
     def generate_offset(self):
         self.generated_code += "RESET f\n"

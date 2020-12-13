@@ -4,13 +4,17 @@ class Symbol():
         self.pidentifier = pidentifier
         self.address = address
         self.is_tab = is_tab
-
+        self.is_defined = False
+        self.value = 0
+        self.values = [-1 for i in range(0,end_index - start_index + 1)]
+        
         if(is_tab):
             self.is_tab = True
             self.start_address = self.address
             self.end_address = self.start_address + (end_index - start_index)
             self.length = self.end_address - self.start_address + 1
             self.tab_offset = start_index
+
 
             #print("Start:" + str(self.start_address) + " " + str(self.end_address)+ " "+ str(self.length) + "\n")
 
@@ -28,6 +32,18 @@ class Symbol():
     
     def get_tab_length(self):
         return self.length
+        
+    def set_value(self, value):
+        self.value = value
+
+    def get_symbol_value(self):
+        return self.value
+
+    def get_tab_symbol_values(self):
+        return self.values
+    
+    def tab_symbol_value_at_index(self, value, index):
+        self.values[index] = value
 
 
             

@@ -166,56 +166,106 @@ def throw_redeclare_error(p, index):
 def p_commands(p):
     '''commands : commands command
                 | command'''
-def p_command_all(p):
+                
+def p_command_assignment(p):
     '''command : identifier ASSIGNMENT expression SEMICOLON
-               | IF condition THEN commands ELSE commands ENDIF
+               | READ  identifier SEMICOLON'''
+
+    global tab_index
+    if p[2] == ":=":
+        symbol =  get_symbol_by_name(p[1])
+
+        # tab(i) == number
+        if(is_tab(p[1]) and not symbol_exists(p[3])):
+            index = tab_indexes[-1]
+            symbol.tab_symbol_value_at_index(p[3], index)
+            code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_indexes.pop()), 'a')
+
+        # tab(i) == tab2(i)/variable
+        elif(is_tab(p[1]) and symbol_exists(p[3])):
+            symbol_asgn = get_symbol_by_name(p[3])
+            value = 0
+
+             # tab(i) == tab2(i)
+            if(is_tab(p[3])):
+                index = tab_indexes[-1]
+                value = symbol_asgn.get_tab_symbol_values()[index]
+                code_generator.print_value_from_adress('b', get_symbol_address(p[3], tab_indexes.pop()), False)
+
+            # tab(i) == variable    
+            else:
+                value = symbol_asgn.get_symbol_value()
+                code_generator.print_value_from_adress('b', get_symbol_address(p[3]), False)
+            
+            index = tab_indexes[-1]
+            address = get_symbol_address(p[1], tab_indexes.pop())
+            code_generator.store_value_from_reg_at_address(address, 'b')
+
+            symbol.tab_symbol_value_at_index(value, index)
+
+        else:
+            # variable = tab(i)
+            if(is_tab(p[3])):
+                index = tab_indexes[-1]
+                value = get_symbol_by_name(p[3]).get_tab_symbol_values()[index]
+                code_generator.store_value_at_address(value, get_symbol_address(p[1], tab_indexes.pop()), 'a')
+            # variable = number
+            else:
+                symbol.set_value(p[3])    
+                code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
+
+        if(not get_symbol_by_name(p[1]).is_defined):
+            symbol.is_defined = True
+
+def p_command_all(p):
+    '''command : IF condition THEN commands ELSE commands ENDIF
                | IF  condition  THEN  commands  ENDIF
                | WHILE  condition  DO  commands  ENDWHILE
                | REPEAT  commands  UNTIL  condition SEMICOLON
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
-               | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR
-               | READ  identifier SEMICOLON'''
-
-    global tab_index
-    #Naprawic przypisanie ze zmienna po prawej stronie
-    if p[2] == ":=":
-        if(is_tab(p[1]) and not symbol_exists(p[3])):
-            code_generator.store_value_at_address(p[3], get_symbol_address(p[1], tab_index), 'a')
-        elif(is_tab(p[1]) and symbol_exists(p[3])):
-            #print(get_symbol_address(p[3], tab_index))
-            code_generator.print_value_from_adress('b', get_symbol_address(p[3]), False)
-            address = get_symbol_address(p[1], tab_index)
-            code_generator.store_value_from_reg_at_address(address, 'b')
-        else:
-            code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
+               | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
 
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
-    global tab_index
+    global tab_indexes
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
-            #print(get_symbol_address(p[2], tab_index))
-            code_generator.print_value_from_adress('f', get_symbol_address(p[2], tab_index), True)
+            code_generator.print_value_from_adress('f', get_symbol_address(p[2], tab_indexes.pop()), True)
         else:
             code_generator.print_value_from_adress('f', get_symbol_address(p[2]), True)
     else:
         code_generator.store_variable(p[2], 'a')
         code_generator.print_value_from_adress('f', code_generator.current_data_offset)
 
-def p_expression(p):
-    '''expression : value
-                  | value ADD value
+def p_expression_val(p):
+    'expression : value'
+    p[0] = p[1]
+
+def p_expression_math(p):
+    '''expression : value ADD value
                   | value SUB value
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
+    global tab_indexes
+    if(symbol_exists(p[1]) or symbol_exists(p[3])):
+        if(is_tab(p[3])):
+            p[3] = get_symbol_by_name(p[3]).get_tab_symbol_values()[tab_indexes.pop()]
+        elif(symbol_exists(p[3])):
+            p[3] = get_symbol_by_name(p[3]).get_symbol_value()
 
-    if len(p) == 2:
-        p[0] = p[1]
-    elif p[2] == '+':
+        if(is_tab(p[1])):
+            p[1] = get_symbol_by_name(p[1]).get_tab_symbol_values()[tab_indexes.pop()]
+        elif(symbol_exists(p[1])):
+            print("lel2")
+            p[1] = get_symbol_by_name(p[1]).get_symbol_value()
+    
+    if p[2] == '+':
         p[0] = p[1] + p[3]
     elif p[2] == '-':
+        print(p[1])
+        print(p[3])
         p[0] = p[1] - p[3]
     elif p[2] == '*':
         p[0] = p[1] * p[3]
@@ -246,7 +296,7 @@ def p_identifier_tab(p):
     'identifier : pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'
     global tab_index
     p[0] = p[1]
-    tab_index = p[3]
+    tab_indexes.append(p[3])
 
 def p_error(p):
     print("[Błąd składni]")
@@ -256,13 +306,18 @@ parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
 symbols = []
 constants = {}
-tab_index = 0
+tab_indexes = []
 
 def symbol_exists(pidentifier):
     for symbol in symbols:
         if pidentifier == symbol.get_pidentifier():
             return True
     return False
+
+def get_symbol_by_name(pidentifier):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier():
+            return symbol
 
 def get_symbol_address(pidentifier, offset=0):
     for symbol in symbols:
