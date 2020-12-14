@@ -23,14 +23,14 @@ BEGIN
 	g := 123;
 	t(3) := t(0);
 	tab(5) := a;
-	tab(5) := tab(0) - tab(4);
+	tab(5) := tab(0) / tab(4);
 	t(5) := tab(0);
 
-	j := 10;
-	i := tab(0) - 1;
+	READ h;
+	i := 1;
+	j := h + c;
 	
 	WRITE j; [ j = h + 15 ]
-	WRITE i;
 	WRITE c; [ c = 15 ]
 	WRITE t(3); [ 999 ]
 	WRITE t(2); [ 555555555 ]

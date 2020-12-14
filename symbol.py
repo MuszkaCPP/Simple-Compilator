@@ -42,7 +42,7 @@ class Symbol():
     def get_tab_symbol_values(self):
         return self.values
     
-    def tab_symbol_value_at_index(self, value, index):
+    def get_tab_symbol_value_at_index(self, value, index):
         self.values[index] = value
 
 
