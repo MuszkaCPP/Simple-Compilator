@@ -20,6 +20,7 @@ class CodeGenerator():
                 self.generated_code += "ADD a c\n"
                 self.generate_number_at_reg(self.address_for_machine_math, 'b')
                 self.generated_code += "STORE a b\n"
+
         elif(address_a != -1):
             #variable + variable
             if(address_b != -1):
@@ -30,16 +31,90 @@ class CodeGenerator():
                 self.generated_code += "ADD d c\n"
                 self.generate_number_at_reg(self.address_for_machine_math, 'b')
                 self.generated_code += "STORE d b\n"
+            #variable + number
+            else:
+                self.generate_number_at_reg(address_a, 'a')
+                self.generate_number_at_reg(var_b, 'b')
+                self.generated_code += "LOAD c a\n"
+                self.generated_code += "ADD a c\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'b')
+                self.generated_code += "STORE a b\n"
 
-            
-        
-    def sub(self, var_a, var_b):
+    def sub(self, var_a = -1, address_a = -1, var_b = -1, address_b = -1):
+        if(var_a != -1):
+            # number + variable
+            if(address_b != -1):
+                self.generate_number_at_reg(var_a, 'a')
+                self.generate_number_at_reg(address_b, 'b')
+                self.generated_code += "LOAD c b\n"
+                self.generated_code += "SUB a c\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'b')
+                self.generated_code += "STORE a b\n"
+
+        elif(address_a != -1):
+            #variable + variable
+            if(address_b != -1):
+                self.generate_number_at_reg(address_a, 'a')
+                self.generate_number_at_reg(address_b, 'b')
+                self.generated_code += "LOAD c b\n"
+                self.generated_code += "LOAD d a\n"
+                self.generated_code += "SUB d c\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'b')
+                self.generated_code += "STORE d b\n"
+            #variable + number
+            else:
+                self.generate_number_at_reg(address_a, 'a')
+                self.generate_number_at_reg(var_b, 'b')
+                self.generated_code += "LOAD c a\n"
+                self.generated_code += "SUB a c\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'b')
+                self.generated_code += "STORE a b\n"
+
+    def mul(self, var_a = -1, address_a = -1, var_b = -1, address_b = -1):
+        #result in register c
+        if(var_a != -1):
+            # number * variable
+            if(address_b != -1):
+                self.generated_code += "RESET c\n"
+                self.generate_number_at_reg(var_a, 'a')
+                self.generated_code += "RESET f\n"
+                self.generate_number_at_reg(address_b, 'f')
+                self.generated_code += "LOAD b f\n"
+                self.generated_code += "JODD b 2\n"
+                self.generated_code += "JUMP 2\n"
+                self.generated_code += "ADD c a\n"
+                self.generated_code += "SHL a\n"
+                self.generated_code += "SHR b\n"
+                self.generated_code += "JZERO b 2\n"
+                self.generated_code += "JUMP -6\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'd')
+                self.generated_code += "STORE c d\n"
+
+        elif(address_a != -1):
+            #variable + variable
+            if(address_b != -1):
+                self.generated_code += "RESET c\n"
+                self.generate_number_at_reg(address_a, 'f')
+                self.generated_code += "LOAD a f\n"
+                self.generated_code += "RESET f\n"
+                self.generate_number_at_reg(address_b, 'f')
+                self.generated_code += "LOAD b f\n"
+                self.generated_code += "JODD b 2\n"
+                self.generated_code += "JUMP 2\n"
+                self.generated_code += "ADD c a\n"
+                self.generated_code += "SHL a\n"
+                self.generated_code += "SHR b\n"
+                self.generated_code += "JZERO b 2\n"
+                self.generated_code += "JUMP -6\n"
+                self.generate_number_at_reg(self.address_for_machine_math, 'd')
+                self.generated_code += "STORE c d\n"
+            #variable + number
+            else:
+                pass
+                
+    def div(self, var_a = -1, address_a = -1, var_b = -1, address_b = -1):
         pass
-    def mul(self, var_a, var_b):
-        pass
-    def div(self, var_a, var_b):
-        pass
-    def mod(self, var_a, var_b):
+    def mod(self, var_a = -1, address_a = -1, var_b = -1, address_b = -1):
         pass
 
     def set_address_for_machine(self, address):
@@ -64,6 +139,9 @@ class CodeGenerator():
         if first_digit == '1':
             self.generated_code += "INC " + str(reg) + "\n"
         else:
+            return
+        
+        if len(bin_var)==0:
             return
 
         for digit in bin_var:
@@ -95,12 +173,26 @@ class CodeGenerator():
         self.generate_number_at_reg(address, 'a')
         self.generated_code += "LOAD c " + str(reg) + "\n"
         self.generated_code += "STORE c a\n"
+    
+    def store_from_address_to_address(self, address_a, address_b, _print=False):
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generate_number_at_reg(address_a, 'a')
+        self.generate_number_at_reg(address_b, 'b')
+        self.generated_code += "LOAD c a\n"
+        self.generated_code += "ADD b c\n"
+        
+        if(_print):
+            self.generated_code += "PUT b\n"
+            pass
+
 
     def get_generated_code(self):
         self.generated_code+="HALT"
         return self.generated_code
 
-    def print_value_from_adress(self, reg, address, _print="False"):
+    def print_value_from_adress(self, reg, address, _print=False):
         self.generate_number_at_reg(address, reg)
 
         if(_print):
@@ -113,10 +205,3 @@ class CodeGenerator():
     def read_from_reg(self, address, reg):
         self.generate_number_at_reg(address, reg)
         self.generated_code += "GET " + str(reg) + "\n"
-
-    def get_tab_elem_by_index(self,tab, index):
-        #Check if index is closer to start address
-        if( tab.start_address + index < tab.end_address - index):
-            pass
-
-        
