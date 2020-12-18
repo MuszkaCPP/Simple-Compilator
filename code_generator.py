@@ -80,18 +80,9 @@ class CodeGenerator():
                 self.generated_code += "RESET f\n"
                 self.generate_number_at_reg(address_b, 'f')
                 self.generated_code += "LOAD b f\n"
-                self.generated_code += "JODD b 2\n"
-                self.generated_code += "JUMP 2\n"
-                self.generated_code += "ADD c a\n"
-                self.generated_code += "SHL a\n"
-                self.generated_code += "SHR b\n"
-                self.generated_code += "JZERO b 2\n"
-                self.generated_code += "JUMP -6\n"
-                self.generate_number_at_reg(self.address_for_machine_math, 'd')
-                self.generated_code += "STORE c d\n"
 
         elif(address_a != -1):
-            #variable + variable
+            #variable * variable
             if(address_b != -1):
                 self.generated_code += "RESET c\n"
                 self.generate_number_at_reg(address_a, 'f')
@@ -99,18 +90,26 @@ class CodeGenerator():
                 self.generated_code += "RESET f\n"
                 self.generate_number_at_reg(address_b, 'f')
                 self.generated_code += "LOAD b f\n"
-                self.generated_code += "JODD b 2\n"
-                self.generated_code += "JUMP 2\n"
-                self.generated_code += "ADD c a\n"
-                self.generated_code += "SHL a\n"
-                self.generated_code += "SHR b\n"
-                self.generated_code += "JZERO b 2\n"
-                self.generated_code += "JUMP -6\n"
-                self.generate_number_at_reg(self.address_for_machine_math, 'd')
-                self.generated_code += "STORE c d\n"
-            #variable + number
+            #variable * number
             else:
-                pass
+                self.generated_code += "RESET c\n"
+                self.generate_number_at_reg(address_a, 'f')
+                self.generated_code += "LOAD a f\n"
+                self.generated_code += "RESET f\n"
+                self.generate_number_at_reg(var_b, 'b')
+
+        self.carry_out_multiplication_algorithm('a','b','c')
+
+    def carry_out_multiplication_algorithm(self, reg_1, reg_2, reg_result):
+        self.generated_code += "JODD " + reg_2 + " 2\n"
+        self.generated_code += "JUMP 2\n"
+        self.generated_code += "ADD " + reg_result + " " + reg_1 + "\n"
+        self.generated_code += "SHL " + reg_1 + "\n"
+        self.generated_code += "SHR " + reg_2 + "\n"
+        self.generated_code += "JZERO " + reg_2 + " 2\n"
+        self.generated_code += "JUMP -6\n"
+        self.generate_number_at_reg(self.address_for_machine_math, 'd')
+        self.generated_code += "STORE " + reg_result + " d\n"
                 
     def div(self, var_a = -1, address_a = -1, var_b = -1, address_b = -1):
         pass
@@ -179,10 +178,12 @@ class CodeGenerator():
         self.generated_code += "RESET b\n"
         self.generated_code += "RESET c\n"
         self.generate_number_at_reg(address_a, 'a')
+        # self.generated_code += "PUT a\n"
         self.generate_number_at_reg(address_b, 'b')
         self.generated_code += "LOAD c a\n"
-        self.generated_code += "ADD b c\n"
-        
+        self.generated_code += "STORE c b\n"
+        # self.generated_code += "PUT b\n"
+         
         if(_print):
             self.generated_code += "PUT b\n"
             pass

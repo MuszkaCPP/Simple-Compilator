@@ -6,7 +6,7 @@ class Symbol():
         self.is_tab = is_tab
         self.is_defined = False
         self.value = 0
-        self.values = [-1 for i in range(0,end_index - start_index + 1)]
+        self.values = [0 for i in range(0,end_index - start_index + 1)]
         
         if(is_tab):
             self.is_tab = True
@@ -39,11 +39,12 @@ class Symbol():
     def get_symbol_value(self):
         return self.value
 
-    def get_tab_symbol_values(self):
-        return self.values
+    def get_tab_symbol_value(self, index):
+        return self.values[index - self.tab_offset]
     
-    def get_tab_symbol_value_at_index(self, value, index):
-        self.values[index] = value
+    def set_tab_symbol_value_at_index(self, value, index):
+        #print(index)
+        self.values[index - self.tab_offset] = value
 
 
             
