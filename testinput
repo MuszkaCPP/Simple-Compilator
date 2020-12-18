@@ -1,37 +1,57 @@
-[ Fibonacci 26 121393]
+[ numbers.imp - liczby ]
 DECLARE
-  tab(987654321:1234567890),
-  a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z
+	a, b, c, t(0:6), d, e, f, g, h, i, j, tab(0:5), k, l, m, p
 BEGIN
-  READ tab(1212121212);
-  a:=tab(1212121212);
-  WRITE a;
-  b:=a;
-  WRITE b;
-  c:=b+a;
-  d:=c+b;
-  e:=d+c;
-  f:=e+d;
-  g:=f+e;
-  h:=g+f;
-  i:=h+g;
-  j:=i+h;
-  k:=j+i;
-  l:=k+j;
-  m:=l+k;
-  n:=m+l;
-  o:=n+m;
-  p:=o+n;
-  q:=p+o;
-  r:=q+p;
-  s:=r+q;
-  t:=s+r;
-  u:=t+s;
-  v:=u+t;
-  w:=v+u;
-  x:=w+v;
-  y:=x+w;
-  z:=y+x;
-  WRITE z;
-  a:=10000*z;
+	WRITE 0;
+	WRITE 1;
+	WRITE 2;
+	WRITE 10;
+	WRITE 100;
+	WRITE 10000;
+	WRITE 1234567890;
+
+	a := 1234566543;
+	b := 677777177;
+	c := 15;
+	t(2) := 555555555;
+	d := 8888;
+	tab(4) := 11;
+	t(0) := 999;
+	e := 1111111111;
+	tab(0) := 7777;
+	f := 2048;
+	g := t(2);
+	t(3) := t(0);
+	tab(5) := a;
+	tab(5) := tab(0) / tab(4);
+	t(5) := tab(0);
+
+	READ h;
+	i := 1;
+	j := h + c;
+
+	READ k;
+	t(6):=k;
+
+	READ t(1);
+	l := t(1);
+
+	READ m;
+	p:=m;
+	
+	WRITE j; [ j = h + 15 ]
+	WRITE c; [ c = 15 ]
+	WRITE t(3); [ 999 ]
+	WRITE t(2); [ 555555555 ]
+	WRITE t(5); [ 7777 ]
+	WRITE t(0); [ 999 ]
+	WRITE tab(4); [ 11 ]
+	WRITE tab(5); [ 707 ]
+	WRITE tab(0); [ 7777 ]
+	WRITE g;	[ 555555555 ]
+	WRITE t(6); [ READ ]
+	WRITE t(1); [ READ ]
+	WRITE l;	[ t(1) ]
+	WRITE p;	[ m ]
+	 
 END

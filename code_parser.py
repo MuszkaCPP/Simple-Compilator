@@ -153,6 +153,7 @@ def p_declarations_single_tab(p):
     'declarations : pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'
     if symbol_exists(p[1]):
         throw_redeclare_error(p,1)
+
     p[0] = p[1]
     symbol = Symbol(p[1], code_generator.get_data_offset(), True, p[3], p[5])
     symbols.append(symbol)
@@ -184,10 +185,13 @@ def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
     global tab_index, left_is_var, right_is_var, machine_math_manager
+
     if p[2] == ":=":
         if(p[3]==-1 or p[3]==-2 or p[3]==-3 or p[3]==-4 or p[3]==-5):
             if(is_tab(p[1])):
-                code_generator.set_address_for_machine(get_symbol_address(p[1], tab_indexes.pop()))
+                code_generator.set_address_for_machine(
+                                get_symbol_address(p[1], tab_indexes.pop())
+                )
             else:
                 code_generator.set_address_for_machine(get_symbol_address(p[1]))
 
@@ -197,88 +201,131 @@ def p_command_assignment(p):
                                             operation=p[3],
                                             address_a=get_symbol_address(machine_math_values[0]),
                                             address_b=get_symbol_address(machine_math_values[1])
-                                            )
+                    )
                 else:
                     machine_math_manager.carry_out_operation(
                                             operation=p[3],
                                             address_a=get_symbol_address(machine_math_values[0]),
                                             var_b = machine_math_values[1]
-                                            )
+                    )
             else:
                 if(right_is_var):
                     machine_math_manager.carry_out_operation(
                                             operation=p[3],
                                             var_a = machine_math_values[0],
                                             address_b=get_symbol_address(machine_math_values[1])
-                                            )
+                    )
             return
 
         symbol = get_symbol_by_name(p[1])
 
-        # LOVELY SPAGHETTI B)
-        # tab(i) == number
-        if(is_tab(p[1]) and not symbol_exists(p[3])):
-            index = tab_indexes[-1]
-            symbol.set_tab_symbol_value_at_index(p[3], index)
+        # tab(i) := []
+        if(is_tab(p[1])):
+            if(symbol_exists(p[3])):
+                symbol_asgn = get_symbol_by_name(p[3])
 
-            code_generator.store_value_at_address(
-                    p[3], get_symbol_address(p[1], tab_indexes.pop()), 'a'
+                # tab(i) := tab_2(i)
+                if(is_tab(p[3])):
+                    right_index = tab_indexes.pop()
+                    left_index = tab_indexes.pop()
+                    value = symbol_asgn.get_tab_symbol_value(right_index)
+
+                    if(value == -1):
+                        code_generator.store_from_address_to_address(
+                            symbol_asgn.get_tab_index_address(right_index),
+                            symbol.get_tab_index_address(left_index)
+                        )
+                        symbol.set_tab_symbol_value_at_index(-1, left_index)
+
+                    else:
+                        code_generator.store_value_at_address(
+                                        value,
+                                        get_symbol_address(p[1], left_index),
+                                        'a'
+                        )
+                        symbol.set_tab_symbol_value_at_index(value, left_index)
+                # tab(i) := variable
+                else:
+                    index = tab_indexes.pop()
+                    value = symbol_asgn.get_symbol_value()
+
+                    if(value == -1):
+                        code_generator.store_from_address_to_address(
+                            symbol_asgn.get_address(),
+                            symbol.get_tab_index_address(index)
+                        )
+                        symbol.set_tab_symbol_value_at_index(-1, index)
+                    else:
+                        code_generator.store_value_at_address(
+                                        value,
+                                        get_symbol_address(p[1], index),
+                                        'a'
+                        )
+                        symbol.set_tab_symbol_value_at_index(value, index)
+            # tab(i) := number
+            else:
+                index = tab_indexes.pop()
+                value = p[3]
+                
+                code_generator.store_value_at_address(
+                                value,
+                                get_symbol_address(p[1], index),
+                                'a'
                 )
 
-        # tab(i) == tab2(i)/variable
-        elif(is_tab(p[1]) and symbol_exists(p[3])):
-            symbol_asgn = get_symbol_by_name(p[3])
-            value = 0
-
-            # tab(i) == tab2(i)
-            if(is_tab(p[3])):
-                index = tab_indexes[-1]
-                print(index)
-                value = symbol_asgn.get_tab_symbol_value(index)
-                if(value == -1):
-                    code_generator.store_from_address_to_address(address, get_symbol_address(p[3], tab_indexes.pop()))
-                else:
-                    code_generator.print_value_from_adress(
-                            'b', get_symbol_address(p[3], tab_indexes.pop())
-                            )
-
-            # tab(i) == variable    
-            else:
-                value = symbol_asgn.get_symbol_value()
-                code_generator.print_value_from_adress('b', get_symbol_address(p[3]))
-            
-            index = tab_indexes[-1]
-            address = get_symbol_address(p[1], tab_indexes.pop())
-            code_generator.store_value_from_reg_at_address(address, 'b')
-
-            symbol.set_tab_symbol_value_at_index(value, index)
-
+                symbol.set_tab_symbol_value_at_index(value, index)
         else:
-            # variable = tab(i)
-            if(is_tab(p[3])):
-                index = tab_indexes[-1]
-                address = get_symbol_address(p[3], index)
-                value = get_symbol_by_name(p[3]).get_tab_symbol_value(tab_indexes.pop())
-                if(value == -1):
-                    code_generator.store_from_address_to_address(address, get_symbol_address(p[1]))
-                else:
-                    code_generator.store_value_at_address(
-                            value, get_symbol_address(p[1]), 'a'
-                            )
-                    symbol.set_value(value)
-            # variable = variable/number
-            else:
-                # variable = variable
-                if(symbol_exists(p[3])):
-                    symbol.set_value(get_symbol_by_name(p[3]).get_symbol_value())
-                    value = get_symbol_by_name(p[3]).get_symbol_value()
+            if(symbol_exists(p[3])):
+                symbol_asgn = get_symbol_by_name(p[3])
+
+                # variable = tab(i)
+                if(is_tab(p[3])):
+                    index = tab_indexes.pop()
+                    value = symbol_asgn.get_tab_symbol_value(index)
+
                     if(value == -1):
-                        code_generator.store_from_address_to_address(get_symbol_address(p[3]), get_symbol_address(p[1]))
+                        code_generator.store_from_address_to_address(
+                            symbol_asgn.get_tab_index_address(index),
+                            symbol.get_address()
+                        )
                     else:
-                        code_generator.store_value_at_address(value, get_symbol_address(p[1]), 'a')
+                        code_generator.store_value_at_address(
+                                        value,
+                                        symbol.get_address(),
+                                        'a'
+                        )
+                        
+                    symbol.set_value(value)
+
+                # variable = variable
                 else:
-                    symbol.set_value(p[3])   
-                    code_generator.store_value_at_address(p[3], get_symbol_address(p[1]), 'a')
+                    value = symbol_asgn.get_symbol_value()
+
+                    if(value == -1):
+                        code_generator.store_from_address_to_address(
+                            symbol_asgn.get_address(),
+                            symbol.get_address()
+                        )
+
+                    else:
+                        code_generator.store_value_at_address(
+                            value,
+                            symbol.get_address(),
+                            'a'
+                        )
+
+                    symbol.set_value(value)
+            # variable = number        
+            else:
+                value = p[3]
+                
+                code_generator.store_value_at_address(
+                    value,
+                    symbol.get_address(),
+                    'a'
+                )
+
+                symbol.set_value(value)
 
         if(not get_symbol_by_name(p[1]).is_defined):
             symbol.is_defined = True
@@ -295,25 +342,32 @@ def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
     global tab_indexes, last_read_symbol
+
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
-            
             index = tab_indexes.pop()
+
             if(index == -1):
                 code_generator.store_from_address_to_address(
                                     get_symbol_address(last_read_symbol),
                                     get_symbol_address(p[2]),
                                     True
-                                )
+                )
             else:
-                code_generator.print_value_from_adress(
-                        'f', get_symbol_address(p[2], index), True
-                    )
+                code_generator.generate_value_from_adress_at_register(
+                                'f',
+                                get_symbol_address(p[2], index),
+                                True
+                )
         else:
-            code_generator.print_value_from_adress('f', get_symbol_address(p[2]), True)
+            code_generator.generate_value_from_adress_at_register('f', get_symbol_address(p[2]), True)
     else:
-        code_generator.store_variable(p[2], 'a')
-        code_generator.print_value_from_adress('f', code_generator.current_data_offset, True)
+        code_generator.store_number(p[2], 'a')
+        code_generator.generate_value_from_adress_at_register(
+                        'f',
+                        code_generator.current_data_offset,
+                        True
+        )
 
 def p_expression_val(p):
     'expression : value'
@@ -354,8 +408,8 @@ def p_expression_math(p):
             p[1] = get_symbol_by_name(p[1]).get_symbol_value()
 
     if(machine_math):
-            machine_math_values.append(p[1])
-            machine_math_values.append(p[3])
+        machine_math_values.append(p[1])
+        machine_math_values.append(p[3])
 
     if p[2] == '+':
         if(machine_math):
@@ -438,19 +492,6 @@ def symbol_exists(pidentifier):
             return True
     return False
 
-def get_symbol_by_name(pidentifier):
-    for symbol in symbols:
-        if pidentifier == symbol.get_pidentifier():
-            return symbol
-
-def get_symbol_address(pidentifier, offset=0):
-    for symbol in symbols:
-        if pidentifier == symbol.get_pidentifier():
-            if(symbol.is_tab):
-                return symbol.get_address() + offset
-            else:
-                return symbol.get_address()
-
 def is_tab(pidentifier):
     for symbol in symbols:
         if pidentifier == symbol.get_pidentifier() and symbol.is_tab:
@@ -470,3 +511,16 @@ def get_parser():
 
 def get_code_generator():
     return code_generator
+
+def get_symbol_by_name(pidentifier):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier():
+            return symbol
+
+def get_symbol_address(pidentifier, offset=0):
+    for symbol in symbols:
+        if pidentifier == symbol.get_pidentifier():
+            if(symbol.is_tab):
+                return symbol.get_address() + offset
+            else:
+                return symbol.get_address()

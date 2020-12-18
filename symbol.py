@@ -15,12 +15,6 @@ class Symbol():
             self.length = self.end_address - self.start_address + 1
             self.tab_offset = start_index
 
-
-            #print("Start:" + str(self.start_address) + " " + str(self.end_address)+ " "+ str(self.length) + "\n")
-
-    def set_address(self, address):
-        self.address = address
-
     def get_address(self):
         return self.address
 
@@ -32,18 +26,27 @@ class Symbol():
     
     def get_tab_length(self):
         return self.length
-        
-    def set_value(self, value):
-        self.value = value
+
+    def get_tab_start_address(self):
+        return self.start_address
+
+    def get_tab_index_address(self, index):
+        return self.start_address + index
 
     def get_symbol_value(self):
         return self.value
 
     def get_tab_symbol_value(self, index):
         return self.values[index - self.tab_offset]
+
+
+    def set_value(self, value):
+        self.value = value
+
+    def set_address(self, address):
+        self.address = address
     
     def set_tab_symbol_value_at_index(self, value, index):
-        #print(index)
         self.values[index - self.tab_offset] = value
 
 

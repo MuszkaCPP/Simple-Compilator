@@ -1,7 +1,6 @@
 from symbol import Symbol
 
 
-
 class CodeGenerator():
     def __init__(self):
         self.registers = ['a', 'b', 'c', 'd', 'e', 'f']
@@ -156,7 +155,7 @@ class CodeGenerator():
         offset = self.get_data_offset()
         self.generate_number_at_reg(offset, reg)
 
-    def store_variable(self, var_a, reg):
+    def store_number(self, var_a, reg):
         self.generate_number_at_reg(var_a, reg)
         self.generate_offset('f')
         self.generated_code += "STORE " + str(reg) + " f\n"
@@ -165,8 +164,6 @@ class CodeGenerator():
         self.generate_number_at_reg(var_a, reg)
         self.generate_number_at_reg(address, 'f')
         self.generated_code += "STORE " + str(reg) + " f\n"
-
-        self.last_stored_var_addr = self.current_data_offset
 
     def store_value_from_reg_at_address(self, address, reg):
         self.generate_number_at_reg(address, 'a')
@@ -178,22 +175,18 @@ class CodeGenerator():
         self.generated_code += "RESET b\n"
         self.generated_code += "RESET c\n"
         self.generate_number_at_reg(address_a, 'a')
-        # self.generated_code += "PUT a\n"
         self.generate_number_at_reg(address_b, 'b')
         self.generated_code += "LOAD c a\n"
         self.generated_code += "STORE c b\n"
-        # self.generated_code += "PUT b\n"
          
         if(_print):
             self.generated_code += "PUT b\n"
-            pass
-
 
     def get_generated_code(self):
         self.generated_code+="HALT"
         return self.generated_code
 
-    def print_value_from_adress(self, reg, address, _print=False):
+    def generate_value_from_adress_at_register(self, reg, address, _print=False):
         self.generate_number_at_reg(address, reg)
 
         if(_print):
