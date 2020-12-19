@@ -174,9 +174,16 @@ def p_command_read(p):
     symbol = get_symbol_by_name(p[2])
 
     if(is_tab(p[2])):
-        index = tab_indexes[-1]
-        code_generator.read_from_reg(get_symbol_address(p[2], index),'f')
-        symbol.set_tab_symbol_value_at_index(-1, tab_indexes.pop())
+        index = tab_indexes.pop()
+        if(index==-1):
+            #READ tab(a)
+            code_generator.store_unknown_value_from_adress_to_address(
+                get_symbol_address(last_read_symbol),
+                get_symbol_address(p[2])
+            )
+        else:
+            code_generator.read_from_reg(get_symbol_address(p[2], index),'f')
+            symbol.set_tab_symbol_value_at_index(-1, index)
     else:
         code_generator.read_from_reg(get_symbol_address(p[2]),'f')
         symbol.set_value(-1)
@@ -184,16 +191,20 @@ def p_command_read(p):
 def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
-    global tab_index, left_is_var, right_is_var, machine_math_manager
+    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values
 
     if p[2] == ":=":
-        if(p[3]==-1 or p[3]==-2 or p[3]==-3 or p[3]==-4 or p[3]==-5):
+        if(p[3]==-2 or p[3]==-3 or p[3]==-4 or p[3]==-5 or p[3]==-6):
+            
             if(is_tab(p[1])):
+                index = tab_indexes.pop()
                 code_generator.set_address_for_machine(
-                                get_symbol_address(p[1], tab_indexes.pop())
+                                get_symbol_address(p[1], index)
                 )
+                get_symbol_by_name(p[1]).set_tab_symbol_value_at_index(-1, index)
             else:
                 code_generator.set_address_for_machine(get_symbol_address(p[1]))
+                get_symbol_by_name(p[1]).set_value(-1)
 
             if(left_is_var):
                 if(right_is_var):
@@ -215,6 +226,7 @@ def p_command_assignment(p):
                                             var_a = machine_math_values[0],
                                             address_b=get_symbol_address(machine_math_values[1])
                     )
+            machine_math_values = machine_math_values[2:]
             return
 
         symbol = get_symbol_by_name(p[1])
@@ -248,13 +260,22 @@ def p_command_assignment(p):
                 else:
                     index = tab_indexes.pop()
                     value = symbol_asgn.get_symbol_value()
-
                     if(value == -1):
-                        code_generator.store_from_address_to_address(
-                            symbol_asgn.get_address(),
-                            symbol.get_tab_index_address(index)
-                        )
-                        symbol.set_tab_symbol_value_at_index(-1, index)
+                        if(index == -1):
+                            index_address = get_symbol_address(last_read_symbol)
+
+                            code_generator.store_unknown_value_by_unknown_index(
+                                            symbol_asgn.get_address(),
+                                            symbol.get_address(),
+                                            index_address
+                            )
+                            symbol.set_tab_symbol_value_at_index(-1, index_address)
+                        else:
+                            code_generator.store_from_address_to_address(
+                                symbol_asgn.get_address(),
+                                symbol.get_tab_index_address(index)
+                            )
+                            symbol.set_tab_symbol_value_at_index(-1, index)
                     else:
                         code_generator.store_value_at_address(
                                         value,
@@ -266,14 +287,22 @@ def p_command_assignment(p):
             else:
                 index = tab_indexes.pop()
                 value = p[3]
-                
-                code_generator.store_value_at_address(
-                                value,
-                                get_symbol_address(p[1], index),
-                                'a'
-                )
+                if(index == -1):
+                    index_address = get_symbol_address(last_read_symbol)
+                    code_generator.store_value_at_unknown_index(
+                                    value,
+                                    symbol.get_address(),
+                                    index_address
+                    )
+                    symbol.set_tab_symbol_value_at_index(value, index_address)
+                else:
+                    code_generator.store_value_at_address(
+                                    value,
+                                    get_symbol_address(p[1], index),
+                                    'a'
+                    )
 
-                symbol.set_tab_symbol_value_at_index(value, index)
+                    symbol.set_tab_symbol_value_at_index(value, index)
         else:
             if(symbol_exists(p[3])):
                 symbol_asgn = get_symbol_by_name(p[3])
@@ -282,7 +311,6 @@ def p_command_assignment(p):
                 if(is_tab(p[3])):
                     index = tab_indexes.pop()
                     value = symbol_asgn.get_tab_symbol_value(index)
-
                     if(value == -1):
                         code_generator.store_from_address_to_address(
                             symbol_asgn.get_tab_index_address(index),
@@ -348,10 +376,9 @@ def p_command_write(p):
             index = tab_indexes.pop()
 
             if(index == -1):
-                code_generator.store_from_address_to_address(
-                                    get_symbol_address(last_read_symbol),
-                                    get_symbol_address(p[2]),
-                                    True
+                code_generator.print_value_by_unknown_index(
+                        get_symbol_address(last_read_symbol),
+                        get_symbol_address(p[2])
                 )
             else:
                 code_generator.generate_value_from_adress_at_register(
@@ -389,7 +416,7 @@ def p_expression_math(p):
             left_is_var = True
             if(value == -1):
                 machine_math = True
-        if(symbol_exists(p[3])and not is_tab(p[3])):
+        if(symbol_exists(p[3]) and not is_tab(p[3])):
             value = get_symbol_by_name(p[3]).value
             right_is_var = True
             if(value == -1):
@@ -413,27 +440,27 @@ def p_expression_math(p):
 
     if p[2] == '+':
         if(machine_math):
-            p[0] = -1
+            p[0] = -2
         else:
             p[0] = p[1] + p[3]
     elif p[2] == '-':
         if(machine_math):
-            p[0] = -2
+            p[0] = -3
         else:
             p[0] = p[1] - p[3]
     elif p[2] == '*':
         if(machine_math):
-            p[0] = -3
+            p[0] = -4
         else:
             p[0] = p[1] * p[3]
     elif p[2] == '/':
         if(machine_math):
-            p[0] = -4
+            p[0] = -5
         else:
             p[0] = p[1] // p[3]
     elif p[2] == '%':
         if(machine_math):
-            p[0] = -5
+            p[0] = -6
         else:
             p[0] = p[1] % p[3]
 

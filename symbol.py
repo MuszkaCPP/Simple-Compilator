@@ -14,6 +14,7 @@ class Symbol():
             self.end_address = self.start_address + (end_index - start_index)
             self.length = self.end_address - self.start_address + 1
             self.tab_offset = start_index
+            self.unknown_values = []
 
     def get_address(self):
         return self.address
@@ -33,6 +34,9 @@ class Symbol():
     def get_tab_index_address(self, index):
         return self.start_address + index
 
+    def get_real_tab_index_address(self, index):
+        return index - self.tab_offset
+
     def get_symbol_value(self):
         return self.value
 
@@ -48,6 +52,14 @@ class Symbol():
     
     def set_tab_symbol_value_at_index(self, value, index):
         self.values[index - self.tab_offset] = value
+
+
+
+    def add_unknown_value_index(self, index):
+        self.unknown_values.append(index)
+    
+    def get_unknown_indexes(self):
+        return self.unknown_values
 
 
             

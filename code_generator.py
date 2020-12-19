@@ -182,6 +182,53 @@ class CodeGenerator():
         if(_print):
             self.generated_code += "PUT b\n"
 
+    def store_unknown_value_from_adress_to_address(self, address_a, tab_start_address):
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generate_number_at_reg(address_a, 'a')
+        self.generate_number_at_reg(tab_start_address, 'b')
+        self.generated_code += "LOAD c a\n"
+        self.generated_code += "ADD b c\n"
+        self.generated_code += "GET b\n"
+
+    def print_value_by_unknown_index(self, address_a, tab_start):
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generate_number_at_reg(address_a, 'a')
+        self.generate_number_at_reg(tab_start, 'b')
+        self.generated_code += "LOAD c a\n"
+        self.generated_code += "ADD b c\n"
+        self.generated_code += "PUT b\n"
+
+    def store_unknown_value_by_unknown_index(self, address_a, tab_address, index_address):
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generated_code += "RESET d\n"
+        self.generated_code += "RESET f\n"
+        self.generate_number_at_reg(address_a, 'a')
+        self.generate_number_at_reg(tab_address, 'b')
+        self.generate_number_at_reg(index_address, 'c')
+        self.generated_code += "LOAD f c\n"
+        self.generated_code += "ADD b f\n"
+        self.generated_code += "LOAD d a\n"
+        self.generated_code += "STORE d b\n"
+
+    def store_value_at_unknown_index(self, var_a, tab_address, index_address):
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generated_code += "RESET d\n"
+        self.generated_code += "RESET f\n"
+        self.generate_number_at_reg(var_a, 'a')
+        self.generate_number_at_reg(tab_address, 'b')
+        self.generate_number_at_reg(index_address, 'c')
+        self.generated_code += "LOAD f c\n"
+        self.generated_code += "ADD b f\n"
+        self.generated_code += "STORE a b\n"
+
     def get_generated_code(self):
         self.generated_code+="HALT"
         return self.generated_code
