@@ -1,4 +1,3 @@
-## **code_generator:**
--ZROBIC SPRAWDZANIE INDEKSOW W TABLICY!
-- assignment konkretnych elementow z tablic
-!!DODAC OBSLUGE LICZB UJEMNYCH!!
+-**ZROBIC SPRAWDZANIE INDEKSOW W TABLICY!**
+-**DODAC OBSLUGE LICZB UJEMNYCH!!**
+-**DOPISAC REGISTER MANAGER (usunac resetowanie rejestrow, szukanie najbardziej optymalnego itd..)**

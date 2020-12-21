@@ -170,7 +170,8 @@ def p_commands(p):
 def p_command_read(p):
     'command : READ identifier SEMICOLON'
 
-    global tab_indexes
+    global tab_indexes, last_read_symbols
+
     symbol = get_symbol_by_name(p[2])
 
     if(is_tab(p[2])):
@@ -178,7 +179,7 @@ def p_command_read(p):
         if(index==-1):
             #READ tab(a)
             code_generator.store_unknown_value_from_adress_to_address(
-                get_symbol_address(last_read_symbol),
+                get_symbol_address(last_read_symbols.pop()),
                 get_symbol_address(p[2])
             )
         else:
@@ -227,6 +228,8 @@ def p_command_assignment(p):
                                             address_b=get_symbol_address(machine_math_values[1])
                     )
             machine_math_values = machine_math_values[2:]
+            left_is_var = False
+            right_is_var = False
             return
 
         symbol = get_symbol_by_name(p[1])
@@ -242,10 +245,21 @@ def p_command_assignment(p):
                     left_index = tab_indexes.pop()
                     value = symbol_asgn.get_tab_symbol_value(right_index)
 
-                    if(value == -1):
+                    #tab(a) dla READ a
+                    if(left_index == -1 and right_index == -1):
+                        right_index_address = get_symbol_address(last_read_symbols.pop())
+                        left_index_address = get_symbol_address(last_read_symbols.pop())
+
+                        code_generator.store_unknown_tab_with_unknown_indexes(
+                                        symbol_asgn.get_address(),
+                                        right_index_address,
+                                        symbol.get_address(),
+                                        left_index_address
+                        )
+                    elif(value == -1):
                         code_generator.store_from_address_to_address(
-                            symbol_asgn.get_tab_index_address(right_index),
-                            symbol.get_tab_index_address(left_index)
+                                    symbol_asgn.get_tab_index_address(right_index),
+                                    symbol.get_tab_index_address(left_index)
                         )
                         symbol.set_tab_symbol_value_at_index(-1, left_index)
 
@@ -262,18 +276,18 @@ def p_command_assignment(p):
                     value = symbol_asgn.get_symbol_value()
                     if(value == -1):
                         if(index == -1):
-                            index_address = get_symbol_address(last_read_symbol)
+                            index_address = get_symbol_address(last_read_symbols.pop())
 
                             code_generator.store_unknown_value_by_unknown_index(
                                             symbol_asgn.get_address(),
                                             symbol.get_address(),
                                             index_address
                             )
-                            symbol.set_tab_symbol_value_at_index(-1, index_address)
+                            #symbol.set_tab_symbol_value_at_index(-1, index_address) -> prawdopodobnie useless
                         else:
                             code_generator.store_from_address_to_address(
-                                symbol_asgn.get_address(),
-                                symbol.get_tab_index_address(index)
+                                            symbol_asgn.get_address(),
+                                            symbol.get_tab_index_address(index)
                             )
                             symbol.set_tab_symbol_value_at_index(-1, index)
                     else:
@@ -288,7 +302,7 @@ def p_command_assignment(p):
                 index = tab_indexes.pop()
                 value = p[3]
                 if(index == -1):
-                    index_address = get_symbol_address(last_read_symbol)
+                    index_address = get_symbol_address(last_read_symbols.pop())
                     code_generator.store_value_at_unknown_index(
                                     value,
                                     symbol.get_address(),
@@ -359,17 +373,19 @@ def p_command_assignment(p):
             symbol.is_defined = True
 
 def p_command_all(p):
-    '''command : IF condition THEN commands ELSE commands ENDIF
-               | IF  condition  THEN  commands  ENDIF
-               | WHILE  condition  DO  commands  ENDWHILE
+    '''command : WHILE  condition  DO  commands  ENDWHILE
                | REPEAT  commands  UNTIL  condition SEMICOLON
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
 
+def p_command_if(p):
+    '''command : IF condition THEN commands ELSE commands ENDIF
+               | IF  condition  THEN  commands  ENDIF'''
+
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
-    global tab_indexes, last_read_symbol
+    global tab_indexes, last_read_symbols
 
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
@@ -377,7 +393,7 @@ def p_command_write(p):
 
             if(index == -1):
                 code_generator.print_value_by_unknown_index(
-                        get_symbol_address(last_read_symbol),
+                        get_symbol_address(last_read_symbols.pop()),
                         get_symbol_address(p[2])
                 )
             else:
@@ -406,6 +422,7 @@ def p_expression_math(p):
                   | value MUL value
                   | value DIV value
                   | value MOD value'''
+                  
     global tab_indexes, left_is_var, right_is_var
     machine_math = False
 
@@ -464,6 +481,7 @@ def p_expression_math(p):
         else:
             p[0] = p[1] % p[3]
 
+
 def p_condition(p):
     '''condition : value EQUALS value
                  | value NOT_EQUALS value
@@ -471,6 +489,37 @@ def p_condition(p):
                  | value GREATER value
                  | value LEQ value
                  | value GEQ value'''
+
+    if p[2] == '=':
+        if(p[1] == p[2]):
+            p[0] = True
+        else:
+            p[0] = False
+    elif p[2] == '!=':
+        if(p[1] != p[2]):
+            p[0] = True
+        else:
+            p[0] = False
+    elif p[2] == '<':
+        if(p[1] < p[2]):
+            p[0] = True
+        else:
+            p[0] == False
+    elif p[2] == '>':
+        if(p[1] > p[2]):
+            p[0] = True
+        else:
+            p[0] = False
+    elif p[2] == '<=':
+        if(p[1] <= p[2]):
+            p[0] = True
+        else:
+            p[0] = False
+    elif p[2] == '>=':
+        if(p[1] >= p[2]):
+            p[0] = True
+        else:
+            p[0] = False
                     
 def p_value_num(p):
     'value : NUM'
@@ -483,10 +532,10 @@ def p_value_identifier(p):
 def p_identifier(p):
     '''identifier : pidentifier
                   | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET'''
-    global tab_indexes, last_read_symbol
+    global tab_indexes, last_read_symbols
     
     if(len(p)>2 and type(p[3])==str):
-        last_read_symbol = p[3]
+        last_read_symbols.append(p[3])
         index = get_symbol_by_name(p[3]).get_symbol_value()
         tab_indexes.append(index)
 
@@ -511,7 +560,7 @@ tab_indexes = []
 left_is_var = False
 right_is_var = False
 machine_math_values = []
-last_read_symbol = ''
+last_read_symbols = []
 
 def symbol_exists(pidentifier):
     for symbol in symbols:
