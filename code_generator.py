@@ -111,10 +111,161 @@ class CodeGenerator():
         self.generated_code += "STORE " + reg_result + " d\n"
                 
     def div(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
-        pass
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generated_code += "RESET d\n"
+        self.generated_code += "RESET e\n"
+        if(val_a != -1):
+
+            # number / variable
+            if(address_b != -1):
+                if(val_a == 0):
+                    self.generated_code += "RESET a\n"
+                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
+                    self.generated_code += "STORE a f\n"
+                else:
+                    self.generate_number_at_reg(val_a, 'a')
+                    self.generated_code += "RESET f\n"
+                    self.generate_number_at_reg(address_b, 'f')
+                    self.generated_code += "LOAD b f\n"
+                    self.carry_out_division_algorithm('a','b','c','d','e')
+
+        elif(address_a != -1):
+            #variable / variable
+            if(address_b != -1):
+                self.generate_number_at_reg(address_a, 'f')
+                self.generated_code += "LOAD a f\n"
+                self.generated_code += "RESET f\n"
+                self.generate_number_at_reg(address_b, 'f')
+                self.generated_code += "LOAD b f\n"
+                self.carry_out_division_algorithm('a','b','c','d','e')
+            #variable / number
+            else:
+                if(val_b == 0):
+                    self.generated_code += "RESET a\n"
+                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
+                    self.generated_code += "STORE a f\n"
+                else:
+                    self.generate_number_at_reg(address_a, 'f')
+                    self.generated_code += "LOAD a f\n"
+                    self.generate_number_at_reg(val_b, 'b')
+                    self.carry_out_division_algorithm('a','b','c','d','e')
+    
+    def carry_out_division_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
+        self.generated_code += "JZERO " + str(reg_1) + " 26\n"
+        self.generated_code += "JZERO " + str(reg_2) + " 25\n"
+
+        self.generated_code += "ADD " + str(reg_tmp) + " " + str(reg_1) + "\n"
+        self.generated_code += "INC " + str(reg_1)+ "\n"
+        self.generated_code += "SUB " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "JZERO " + str(reg_1)+ " 5\n"
+        self.generated_code += "ADD " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "INC " + str(counter)+ "\n"
+        self.generated_code += "SHL " + str(reg_2)+ "\n"
+        self.generated_code += "JUMP -5\n"
+
+        self.generated_code += "ADD " + str(reg_1)+ " " + str(reg_tmp)+ "\n"
+        self.generated_code += "SHR " + str(reg_2)+ "\n"
+        
+        self.generated_code += "RESET " + str(reg_tmp)+ "\n"
+        self.generated_code += "ADD " + str(reg_tmp)+ " " + str(reg_1)+ "\n"
+
+        self.generated_code += "INC " + str(reg_tmp)+ "\n"
+        self.generated_code += "SUB " + str(reg_tmp)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "JZERO " + str(reg_tmp)+ " 5\n"
+        self.generated_code += "SUB " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "SHL " + str(quotient)+ "\n"
+        self.generated_code += "INC " + str(quotient)+ "\n"
+        self.generated_code += "JUMP 2\n"
+        self.generated_code += "SHL " + str(quotient)+ "\n"
+
+        self.generated_code += "SHR " + str(reg_2)+ "\n"
+
+        self.generated_code += "DEC " + str(counter)+ "\n"
+        self.generated_code += "JZERO " + str(counter)+ " 2\n"
+        self.generated_code += "JUMP -13\n"
+        self.generate_number_at_reg(self.address_for_machine_math, 'f')
+        self.generated_code += "STORE " + str(quotient)+ " f\n"
+                
     
     def mod(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
-        pass
+        self.generated_code += "RESET a\n"
+        self.generated_code += "RESET b\n"
+        self.generated_code += "RESET c\n"
+        self.generated_code += "RESET d\n"
+        self.generated_code += "RESET e\n"
+        if(val_a != -1):
+
+            # number / variable
+            if(address_b != -1):
+                if(val_a == 0):
+                    self.generated_code += "RESET a\n"
+                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
+                    self.generated_code += "STORE a f\n"
+                else:
+                    self.generate_number_at_reg(val_a, 'a')
+                    self.generated_code += "RESET f\n"
+                    self.generate_number_at_reg(address_b, 'f')
+                    self.generated_code += "LOAD b f\n"
+                    self.carry_out_modulo_algorithm('a','b','c','d','e')
+
+        elif(address_a != -1):
+            #variable / variable
+            if(address_b != -1):
+                self.generate_number_at_reg(address_a, 'f')
+                self.generated_code += "LOAD a f\n"
+                self.generated_code += "RESET f\n"
+                self.generate_number_at_reg(address_b, 'f')
+                self.generated_code += "LOAD b f\n"
+                self.carry_out_modulo_algorithm('a','b','c','d','e')
+            #variable / number
+            else:
+                if(val_b == 0):
+                    self.generated_code += "RESET a\n"
+                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
+                    self.generated_code += "STORE a f\n"
+                else:
+                    self.generate_number_at_reg(address_a, 'f')
+                    self.generated_code += "LOAD a f\n"
+                    self.generate_number_at_reg(val_b, 'b')
+                    self.carry_out_modulo_algorithm('a','b','c','d','e')
+
+    def carry_out_modulo_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
+        self.generated_code += "JZERO " + str(reg_1) + " 26\n"
+        self.generated_code += "JZERO " + str(reg_2) + " 25\n"
+        
+        self.generated_code += "ADD " + str(reg_tmp) + " " + str(reg_1) + "\n"
+        self.generated_code += "INC " + str(reg_1)+ "\n"
+        self.generated_code += "SUB " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "JZERO " + str(reg_1)+ " 5\n"
+        self.generated_code += "ADD " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "INC " + str(counter)+ "\n"
+        self.generated_code += "SHL " + str(reg_2)+ "\n"
+        self.generated_code += "JUMP -5\n"
+
+        self.generated_code += "ADD " + str(reg_1)+ " " + str(reg_tmp)+ "\n"
+        self.generated_code += "SHR " + str(reg_2)+ "\n"
+        
+        self.generated_code += "RESET " + str(reg_tmp)+ "\n"
+        self.generated_code += "ADD " + str(reg_tmp)+ " " + str(reg_1)+ "\n"
+
+        self.generated_code += "INC " + str(reg_tmp)+ "\n"
+        self.generated_code += "SUB " + str(reg_tmp)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "JZERO " + str(reg_tmp)+ " 5\n"
+        self.generated_code += "SUB " + str(reg_1)+ " " + str(reg_2)+ "\n"
+        self.generated_code += "SHL " + str(quotient)+ "\n"
+        self.generated_code += "INC " + str(quotient)+ "\n"
+        self.generated_code += "JUMP 2\n"
+        self.generated_code += "SHL " + str(quotient)+ "\n"
+
+        self.generated_code += "SHR " + str(reg_2)+ "\n"
+
+        self.generated_code += "DEC " + str(counter)+ "\n"
+        self.generated_code += "JZERO " + str(counter)+ " 2\n"
+        self.generated_code += "JUMP -13\n"
+        self.generate_number_at_reg(self.address_for_machine_math, 'f')
+        self.generated_code += "STORE " + str(reg_1)+ " f\n"
 
     def set_address_for_machine(self, address):
         self.address_for_machine_math = address

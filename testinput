@@ -1,9 +1,8 @@
 
 DECLARE
-    a, b, t(0:3), tab(0:10), c
+    a, b, c
 BEGIN
     READ a;
-    READ b;
-    c:= a*b;
-    WRITE c;
+    b:=a/1234567890;
+    WRITE b;
 END

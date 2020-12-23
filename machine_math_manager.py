@@ -29,6 +29,7 @@ class MachineMathManager():
 
             elif(var_a != 0 and address_b != 0):
                 self.code_generator.sub(var_a=var_a , address_b=address_b)
+
         elif(operation==-4):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.mul(address_a=address_a, address_b=address_b)
@@ -38,7 +39,23 @@ class MachineMathManager():
 
             elif(var_a != 0 and address_b != 0):
                 self.code_generator.mul(var_a=var_a , address_b=address_b)
+
         elif(operation==-5):
-            pass
+            if(address_a != 0 and address_b != 0):
+                self.code_generator.div(address_a=address_a, address_b=address_b)
+                
+            elif(address_a != 0 and var_b != 0):
+                self.code_generator.div(address_a=address_a, val_b=var_b)
+
+            elif(var_a != 0 and address_b != 0):
+                self.code_generator.div(val_a=var_a , address_b=address_b)
+
         elif(operation==-6):
-            pass
+            if(address_a != 0 and address_b != 0):
+                self.code_generator.mod(address_a=address_a, address_b=address_b)
+                
+            elif(address_a != 0 and var_b != 0):
+                self.code_generator.mod(address_a=address_a, val_b=var_b)
+
+            elif(var_a != 0 and address_b != 0):
+                self.code_generator.mod(val_a=var_a , address_b=address_b)
