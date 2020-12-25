@@ -5,57 +5,57 @@ class MachineMathManager():
 
     def carry_out_operation(self, 
                             operation = 0,
-                            var_a=0,
+                            val_a=0,
                             address_a=0,
-                            var_b=0,
+                            val_b=0,
                             address_b=0,
                             ):
         if(operation==-2):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.add(address_a=address_a, address_b=address_b)
 
-            elif(address_a != 0 and var_b != 0):
-                self.code_generator.add(address_a=address_a, var_b=var_b)
+            elif(address_a != 0 and val_b != 0):
+                self.code_generator.add(address_a=address_a, val_b=val_b)
 
-            elif(var_a != 0 and address_b != 0):
-                self.code_generator.add(var_a=var_a , address_b=address_b)
+            elif(val_a != 0 and address_b != 0):
+                self.code_generator.add(val_a=val_a , address_b=address_b)
 
         elif(operation==-3):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.sub(address_a=address_a, address_b=address_b)
                 
-            elif(address_a != 0 and var_b != 0):
-                self.code_generator.sub(address_a=address_a, var_b=var_b)
+            elif(address_a != 0 and val_b != 0):
+                self.code_generator.sub(address_a=address_a, val_b=val_b)
 
-            elif(var_a != 0 and address_b != 0):
-                self.code_generator.sub(var_a=var_a , address_b=address_b)
+            elif(val_a != 0 and address_b != 0):
+                self.code_generator.sub(val_a=val_a , address_b=address_b)
 
         elif(operation==-4):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.mul(address_a=address_a, address_b=address_b)
                 
-            elif(address_a != 0 and var_b != 0):
-                self.code_generator.mul(address_a=address_a, var_b=var_b)
+            elif(address_a != 0 and val_b != 0):
+                self.code_generator.mul(address_a=address_a, val_b=val_b)
 
-            elif(var_a != 0 and address_b != 0):
-                self.code_generator.mul(var_a=var_a , address_b=address_b)
+            elif(val_a != 0 and address_b != 0):
+                self.code_generator.mul(val_a=val_a , address_b=address_b)
 
         elif(operation==-5):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.div(address_a=address_a, address_b=address_b)
                 
-            elif(address_a != 0 and var_b != 0):
-                self.code_generator.div(address_a=address_a, val_b=var_b)
+            elif(address_a != 0 and val_b != 0):
+                self.code_generator.div(address_a=address_a, val_b=val_b)
 
-            elif(var_a != 0 and address_b != 0):
-                self.code_generator.div(val_a=var_a , address_b=address_b)
+            elif(val_a != 0 and address_b != 0):
+                self.code_generator.div(val_a=val_a , address_b=address_b)
 
         elif(operation==-6):
             if(address_a != 0 and address_b != 0):
                 self.code_generator.mod(address_a=address_a, address_b=address_b)
                 
-            elif(address_a != 0 and var_b != 0):
-                self.code_generator.mod(address_a=address_a, val_b=var_b)
+            elif(address_a != 0 and val_b != 0):
+                self.code_generator.mod(address_a=address_a, val_b=val_b)
 
-            elif(var_a != 0 and address_b != 0):
-                self.code_generator.mod(val_a=var_a , address_b=address_b)
+            elif(val_a != 0 and address_b != 0):
+                self.code_generator.mod(val_a=val_a , address_b=address_b)

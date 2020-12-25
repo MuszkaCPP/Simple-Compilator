@@ -4,6 +4,7 @@ import sys
 from symbol import Symbol
 from code_generator import CodeGenerator
 from machine_math_manager import MachineMathManager
+from machine_conditions_manager import MachineConditionsManager
 
 tokens = (
     "READ",
@@ -172,6 +173,9 @@ def p_command_read(p):
 
     global tab_indexes, last_read_symbols
 
+    if(in_if_statement and not if_passed):
+        return
+
     symbol = get_symbol_by_name(p[2])
 
     if(is_tab(p[2])):
@@ -193,6 +197,9 @@ def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
     global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values
+
+    if(in_if_statement and not if_passed):
+        return
 
     if p[2] == ":=":
         if(p[3]==-2 or p[3]==-3 or p[3]==-4 or p[3]==-5 or p[3]==-6):
@@ -218,13 +225,13 @@ def p_command_assignment(p):
                     machine_math_manager.carry_out_operation(
                                             operation=p[3],
                                             address_a=get_symbol_address(machine_math_values[0]),
-                                            var_b = machine_math_values[1]
+                                            val_b = machine_math_values[1]
                     )
             else:
                 if(right_is_var):
                     machine_math_manager.carry_out_operation(
                                             operation=p[3],
-                                            var_a = machine_math_values[0],
+                                            val_a = machine_math_values[0],
                                             address_b=get_symbol_address(machine_math_values[1])
                     )
             machine_math_values = machine_math_values[2:]
@@ -378,14 +385,33 @@ def p_command_all(p):
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
 
-def p_command_if(p):
-    '''command : IF condition THEN commands ELSE commands ENDIF
-               | IF  condition  THEN  commands  ENDIF'''
+def p_command_if_else(p):
+    'command : IF if_occured condition THEN commands ELSE commands ENDIF'
+
+    global in_if_statement
+
+    in_if_statement = False
+
+def p_command_if_endif(p):
+    'command : IF if_occured condition  THEN  commands  ENDIF'
+
+    global in_if_statement
+
+    in_if_statement = False
+
+def p_if_occured(p):
+    "if_occured :"
+
+    global in_if_statement
+    in_if_statement = True
 
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
-    global tab_indexes, last_read_symbols
+    global tab_indexes, last_read_symbols, in_if_statement, if_passed
+
+    if(in_if_statement and not if_passed):
+        return
 
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
@@ -490,37 +516,181 @@ def p_condition(p):
                  | value LEQ value
                  | value GEQ value'''
 
+    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes
+    machine_condition = False
+    left_is_var = False
+    right_is_var = False
+    condition = ""
+    left_index = 0
+    right_index = 0
+
+    #Machine conditions
+    if(symbol_exists(p[3])):
+        right_is_var = True
+        value = 0
+        if(is_tab(p[3])):
+            right_index = tab_indexes.pop()
+        else:
+            value = get_symbol_by_name(p[3]).get_symbol_value()
+        
+        if(value == -1 or right_index == -1):
+            machine_condition = True
+
+    if(symbol_exists(p[1])):
+        left_is_var = True
+        value = 0
+        if(is_tab(p[1])):
+            left_index = tab_indexes.pop()
+        else:
+            value = get_symbol_by_name(p[1]).get_symbol_value()
+        
+        if(value == -1 or left_index == -1):
+            machine_condition = True
+
+    tab_indexes.append(left_index)
+    tab_indexes.append(right_index)  
+
+    if(not machine_condition and (symbol_exists(p[1]) or symbol_exists(p[3]))):
+        if(is_tab(p[3])):
+            p[3] = get_symbol_by_name(p[3]).get_tab_symbol_value(tab_indexes.pop())
+        elif(symbol_exists(p[3])):
+            p[3] = get_symbol_by_name(p[3]).get_symbol_value()
+
+        if(is_tab(p[1])):
+            p[1] = get_symbol_by_name(p[1]).get_tab_symbol_value(tab_indexes.pop())
+        elif(symbol_exists(p[1])):
+            p[1] = get_symbol_by_name(p[1]).get_symbol_value()
+
     if p[2] == '=':
-        if(p[1] == p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = "="
         else:
-            p[0] = False
+            if(p[1] == p[3]):
+                p[0] = True
+            else:
+                p[0] = False
     elif p[2] == '!=':
-        if(p[1] != p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = "!="
         else:
-            p[0] = False
+            if(p[1] != p[3]):
+                p[0] = True
+            else:
+                p[0] = False
     elif p[2] == '<':
-        if(p[1] < p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = "<"
         else:
-            p[0] == False
+            if(p[1] < p[3]):
+                p[0] = True
+            else:
+                p[0] == False
     elif p[2] == '>':
-        if(p[1] > p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = ">"
         else:
-            p[0] = False
+            if(p[1] > p[3]):
+                p[0] = True
+            else:
+                p[0] = False
     elif p[2] == '<=':
-        if(p[1] <= p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = "<="
         else:
-            p[0] = False
+            if(p[1] <= p[3]):
+                p[0] = True
+            else:
+                p[0] = False
     elif p[2] == '>=':
-        if(p[1] >= p[2]):
-            p[0] = True
+        if(machine_condition):
+            condition = ">="
         else:
-            p[0] = False
-                    
+            if(p[1] >= p[3]):
+                p[0] = True
+            else:
+                p[0] = False
+
+    if(in_if_statement and not machine_condition):
+        if(p[0] == False):
+            if_passed = False
+        elif(p[0] == True):
+            if_passed = True
+            
+        return
+
+    if(machine_condition):
+        if(left_is_var):
+            left_symbol = get_symbol_by_name(p[1])
+
+            if(is_tab(p[1])):
+                if(right_is_var):
+                    right_symbol = get_symbol_by_name(p[3])
+
+                    #tab(a) [=] t(b)
+                    if(is_tab(p[3])):
+                        right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        right_address = right_symbol.get_tab_index_address(right_index_address)
+
+                        left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        left_address = left_symbol.get_tab_index_address(left_index_address)
+                        
+                        machine_conditions_manager.carry_out_condition(
+                            condition=condition,
+                            address_a=left_address,
+                            address_b=right_address
+                        )
+                    #tab(a) [=] b
+                    else:
+                        right_address = right_symbol.get_address()
+                        left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        left_address = left_symbol.get_tab_index_address(left_index_address)
+
+                        machine_conditions_manager.carry_out_condition(
+                            condition=condition,
+                            address_a=left_address,
+                            address_b= right_address
+                        )
+                else:
+                    #tab(a) [=] value
+                    right_value = p[3]
+                    left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                    left_address = left_symbol.get_tab_index_address(left_index_address)
+
+                    machine_conditions_manager.carry_out_condition(
+                        condition=condition,
+                        address_a=left_address,
+                        val_b=right_value
+                    )
+
+        else:
+            if(right_is_var):
+                #value = tab(a)
+                right_symbol = get_symbol_by_name(p[3])
+                left_value = p[1]
+
+                if(is_tab(p[3])):
+                    right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                    right_address = right_symbol.get_tab_index_address(right_index_address)
+
+                    machine_conditions_manager.carry_out_condition(
+                        condition=condition,
+                        val_a=left_value,
+                        address_b=right_address
+                    )
+                #value = a
+                else:
+                    right_address = right_symbol.get_address()
+
+                    machine_conditions_manager.carry_out_condition(
+                        condition=condition,
+                        val_a=left_value,
+                        address_b=right_address
+                    )
+
+    left_is_var = False
+    right_is_var = False
+    machine_condition = False
+
 def p_value_num(p):
     'value : NUM'
     p[0] = p[1]
@@ -554,13 +724,17 @@ lexer = lex.lex()
 parser = yacc.yacc(start='program')
 code_generator = CodeGenerator()
 machine_math_manager = MachineMathManager(code_generator)
+machine_conditions_manager = MachineConditionsManager(code_generator)
 
 symbols = []
 tab_indexes = []
 left_is_var = False
 right_is_var = False
 machine_math_values = []
+machine_condition_values = []
 last_read_symbols = []
+in_if_statement = False
+if_passed = False
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

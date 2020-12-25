@@ -1,8 +1,13 @@
 
 DECLARE
-    a, b, c
+    a, b, c, t(0:3), tab(0:3)
 BEGIN
-    READ a;
-    b:=a/1234567890;
-    WRITE b;
+    a:=1;
+    b:=2;
+    t(a):=100;
+    tab(b):=100;
+    IF t(a)=101 THEN
+      WRITE b;
+    ENDIF
+    WRITE t(a);
 END
