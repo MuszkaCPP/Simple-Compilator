@@ -1,6 +1,10 @@
-DECLARE [ XDDDD ]
-    b, b
+
+DECLARE
+    a, b, c, t(0:3), tab(0:2)
 BEGIN
-    b:=2+2;
-    b:=2+1;
+    READ a;
+    READ b;
+    tab(b):=2;
+    WRITE tab(b);
+    WRITE tab(a);
 END

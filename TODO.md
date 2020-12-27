@@ -1,6 +1,5 @@
-## **code_generator:**
-
-##### **Optymalizacja**:
-- przy store_variable:
-    - jesli current_value * 2^(x) == var_a --> robimy x/2 razy SHL, zamiast x razy INC
-        
+- **ZROBIC SPRAWDZANIE INDEKSOW W TABLICY!**
+- **DODAC OBSLUGE LICZB UJEMNYCH!!**
+- **DOPISAC REGISTER MANAGER (usunac resetowanie rejestrow, szukanie najbardziej optymalnego itd..)**
+- **poprawic 1 % 1**
+- **tab(a):=t(b)[*]t(b) dla READ a,b**
