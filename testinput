@@ -1,13 +1,10 @@
 
 DECLARE
-    a, b, c, t(0:3), tab(0:3)
+    a, b, c, t(0:3), tab(0:2)
 BEGIN
-    a:=1;
-    b:=2;
-    t(a):=100;
-    tab(b):=100;
-    IF t(a)=101 THEN
-      WRITE b;
-    ENDIF
-    WRITE t(a);
+    READ a;
+    READ b;
+    tab(b):=2;
+    WRITE tab(b);
+    WRITE tab(a);
 END

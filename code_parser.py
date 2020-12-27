@@ -315,7 +315,7 @@ def p_command_assignment(p):
                                     symbol.get_address(),
                                     index_address
                     )
-                    symbol.set_tab_symbol_value_at_index(value, index_address)
+                    #symbol.set_tab_symbol_value_at_index(value, index_address)
                 else:
                     code_generator.store_value_at_address(
                                     value,
@@ -379,6 +379,8 @@ def p_command_assignment(p):
         if(not get_symbol_by_name(p[1]).is_defined):
             symbol.is_defined = True
 
+    print(symbol.values)
+
 def p_command_all(p):
     '''command : WHILE  condition  DO  commands  ENDWHILE
                | REPEAT  commands  UNTIL  condition SEMICOLON
@@ -388,23 +390,31 @@ def p_command_all(p):
 def p_command_if_else(p):
     'command : IF if_occured condition THEN commands ELSE commands ENDIF'
 
-    global in_if_statement
+    global in_if_statement, machine_condition
 
     in_if_statement = False
+    if(machine_condition):
+        machine_condition = False
+        code_generator.replace_jump_for_condition()
 
 def p_command_if_endif(p):
     'command : IF if_occured condition  THEN  commands  ENDIF'
 
-    global in_if_statement
+    global in_if_statement, machine_condition
 
     in_if_statement = False
+
+    if(machine_condition):
+        machine_condition = False
+        code_generator.replace_jump_for_condition()
+    
+
 
 def p_if_occured(p):
     "if_occured :"
 
     global in_if_statement
     in_if_statement = True
-
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
@@ -516,8 +526,7 @@ def p_condition(p):
                  | value LEQ value
                  | value GEQ value'''
 
-    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes
-    machine_condition = False
+    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes, machine_condition
     left_is_var = False
     right_is_var = False
     condition = ""
@@ -547,8 +556,10 @@ def p_condition(p):
         if(value == -1 or left_index == -1):
             machine_condition = True
 
-    tab_indexes.append(left_index)
-    tab_indexes.append(right_index)  
+    if(is_tab(p[1])):
+        tab_indexes.append(left_index)
+    if(is_tab(p[3])):
+        tab_indexes.append(right_index)  
 
     if(not machine_condition and (symbol_exists(p[1]) or symbol_exists(p[3]))):
         if(is_tab(p[3])):
@@ -610,12 +621,14 @@ def p_condition(p):
             else:
                 p[0] = False
 
-    if(in_if_statement and not machine_condition):
+    if(in_if_statement and machine_condition):
+        if_passed = True
+    elif(in_if_statement and not machine_condition):
         if(p[0] == False):
             if_passed = False
         elif(p[0] == True):
             if_passed = True
-            
+
         return
 
     if(machine_condition):
@@ -661,7 +674,31 @@ def p_condition(p):
                         address_a=left_address,
                         val_b=right_value
                     )
+            else:
+                left_address = left_symbol.get_address()
 
+                if(right_is_var):
+                    right_symbol = get_symbol_by_name(p[3])
+                    
+                    if(is_tab(p[3])):
+                        pass
+                    else:
+                        right_address = right_symbol.get_address()
+
+                        machine_conditions_manager.carry_out_condition(
+                            condition=condition,
+                            address_a=left_address,
+                            address_b=right_address
+                        )
+                else:
+                    right_value = p[3]
+
+                    machine_conditions_manager.carry_out_condition(
+                        condition=condition,
+                        address_a=left_address,
+                        val_b = right_value
+                    )
+                    
         else:
             if(right_is_var):
                 #value = tab(a)
@@ -689,7 +726,6 @@ def p_condition(p):
 
     left_is_var = False
     right_is_var = False
-    machine_condition = False
 
 def p_value_num(p):
     'value : NUM'
@@ -733,8 +769,10 @@ right_is_var = False
 machine_math_values = []
 machine_condition_values = []
 last_read_symbols = []
+
 in_if_statement = False
 if_passed = False
+machine_condition = False
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

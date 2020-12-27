@@ -2,3 +2,4 @@
 - **DODAC OBSLUGE LICZB UJEMNYCH!!**
 - **DOPISAC REGISTER MANAGER (usunac resetowanie rejestrow, szukanie najbardziej optymalnego itd..)**
 - **poprawic 1 % 1**
+- **tab(a):=t(b)[*]t(b) dla READ a,b**

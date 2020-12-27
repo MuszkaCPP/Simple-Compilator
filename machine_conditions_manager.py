@@ -5,51 +5,51 @@ class MachineConditionsManager():
 
     def carry_out_condition(self, 
                             condition = "",
-                            val_a=0,
-                            address_a=0,
-                            val_b=0,
-                            address_b=0,
+                            val_a=-1,
+                            address_a=-1,
+                            val_b=-1,
+                            address_b=-1,
                             ):
         if(condition=="="):
-            if(address_a != 0 and address_b != 0):
-                pass
-            elif(address_a != 0 and val_b != 0):
-                pass
-            elif(val_a != 0 and address_b != 0):
-                pass
-            
+            if(address_a != -1 and address_b != -1):
+                self.code_generator.equals(address_a=address_a, address_b=address_b)
+            elif(address_a != -1 and val_b != -1):
+                self.code_generator.equals(address_a=address_a, val_b=val_b)
+            elif(val_a != -1 and address_b != -1):
+                self.code_generator.equals(val_a=val_a, address_b=address_b)
+
         elif(condition=="!="):
-            if(address_a != 0 and address_b != 0):
+            if(address_a != -1 and address_b != -1):
                 pass
-            elif(address_a != 0 and val_b != 0):
+            elif(address_a != -1 and val_b != -1):
                 pass
-            elif(val_a != 0 and address_b != 0):
+            elif(val_a != -1 and address_b != -1):
                 pass
         elif(condition=="<"):
-            if(address_a != 0 and address_b != 0):
+            if(address_a != -1 and address_b != -1):
                 pass
-            elif(address_a != 0 and val_b != 0):
+            elif(address_a != -1 and val_b != -1):
                 pass
-            elif(val_a != 0 and address_b != 0):
+            elif(val_a != -1 and address_b != -1):
                 pass
         elif(condition==">"):
-            if(address_a != 0 and address_b != 0):
+            if(address_a != -1 and address_b != -1):
                 pass
-            elif(address_a != 0 and val_b != 0):
+            elif(address_a != -1 and val_b != -1):
                 pass
-            elif(val_a != 0 and address_b != 0):
+            elif(val_a != -1 and address_b != -1):
                 pass
         elif(condition=="<="):
-            if(address_a != 0 and address_b != 0):
+            if(address_a != -1 and address_b != -1):
                 pass
-            elif(address_a != 0 and val_b != 0):
+            elif(address_a != -1 and val_b != -1):
                 pass
-            elif(val_a != 0 and address_b != 0):
+            elif(val_a != -1 and address_b != -1):
                 pass
         elif(condition==">="):
-            if(address_a != 0 and address_b != 0):
+            if(address_a != -1 and address_b != -1):
                 pass
-            elif(address_a != 0 and val_b != 0):
+            elif(address_a != -1 and val_b != -1):
                 pass
-            elif(val_a != 0 and address_b != 0):
+            elif(val_a != -1 and address_b != -1):
                 pass
