@@ -1,10 +1,17 @@
 
 DECLARE
-    a, b, c, t(0:3), tab(0:2)
+    a, b, c, t(0:3), tab(0:3)
 BEGIN
     READ a;
     READ b;
-    tab(b):=2;
-    WRITE tab(b);
-    WRITE tab(a);
+    READ c;
+    t(1):= 11;
+    tab(b):=11;
+    tab(c):=50;
+
+    t(a):= 2%t(1); [1]
+    t(3):= 49%tab(c); [6]
+
+    WRITE t(a);
+    WRITE t(3);
 END

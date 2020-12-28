@@ -11,16 +11,53 @@ class CodeGenerator():
         self.length_before_jump = 0
 
     # Math
-    def add(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
-        if(val_a != -1):
-            # number + variable
-            if(address_b != -1):
-                self.generate_number_at_reg(val_a, 'a')
+    def add(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+
+        self.append_code("RESET a\n")
+        self.append_code("RESET b\n")
+        self.append_code("RESET c\n")
+        self.append_code("RESET d\n")
+        self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
+
+        if(left_index_address != -1):
+            self.generate_number_at_reg(address_a, 'a')
+            self.generate_number_at_reg(left_index_address, 'b')
+
+            self.append_code("LOAD c b\n")
+            self.append_code("ADD a c\n")
+            self.append_code("LOAD e a\n")
+            
+            self.append_code("RESET c\n")
+            self.append_code("RESET b\n")
+
+            #tab(a) + tab(b)
+            if(right_index_address != -1):
+
                 self.generate_number_at_reg(address_b, 'b')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD b d\n")
+
+                self.append_code("LOAD f b\n")
+
+                self.append_code("ADD e f\n")
+
+            #tab(b) + variable
+            elif(address_b != -1):
+                self.generate_number_at_reg(address_b, 'b')
+
                 self.append_code("LOAD c b\n")
-                self.append_code("ADD a c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE a b\n")
+                self.append_code("ADD e c\n")
+
+            #tab(a) + value
+            elif(val_b != -1):
+                self.generate_number_at_reg(val_b, 'b')
+                self.append_code("ADD e b\n")
 
         elif(address_a != -1):
             #variable + variable
@@ -30,57 +67,187 @@ class CodeGenerator():
                 self.append_code("LOAD c b\n")
                 self.append_code("LOAD d a\n")
                 self.append_code("ADD d c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE d b\n")
+
+                self.append_code("RESET e\n")
+                self.append_code("ADD e d\n")
+
             #variable + number
             else:
                 self.generate_number_at_reg(address_a, 'a')
                 self.generate_number_at_reg(val_b, 'b')
                 self.append_code("LOAD c a\n")
-                self.append_code("ADD a c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE a b\n")
+                self.append_code("ADD c b\n")
 
-    def sub(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
-        if(val_a != -1):
+                self.append_code("RESET e\n")
+                self.append_code("ADD e c\n")
+
+
+    def sub(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+        self.append_code("RESET a\n")
+        self.append_code("RESET b\n")
+        self.append_code("RESET c\n")
+        self.append_code("RESET d\n")
+        self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
+
+        if(left_index_address != -1):
+            self.generate_number_at_reg(address_a, 'a')
+            self.generate_number_at_reg(left_index_address, 'b')
+
+            self.append_code("LOAD c b\n")
+            self.append_code("ADD a c\n")
+            self.append_code("LOAD e a\n")
+            
+            self.append_code("RESET c\n")
+            self.append_code("RESET b\n")
+
+            #tab(a) - tab(b)
+            if(right_index_address != -1):
+
+                self.generate_number_at_reg(address_b, 'b')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD b d\n")
+
+                self.append_code("LOAD f b\n")
+
+                self.append_code("SUB e f\n")
+
+            #tab(a) - variable
+            elif(address_b != -1):
+                self.generate_number_at_reg(address_b, 'b')
+
+                self.append_code("LOAD c b\n")
+                self.append_code("SUB e c\n")
+
+            #tab(a) - value
+            elif(val_b != -1):
+                self.generate_number_at_reg(val_b, 'b')
+                self.append_code("SUB e b\n")
+
+        elif(val_a != -1):
+            # number - tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(val_a, 'a')
+
+                self.generate_number_at_reg(address_b, 'b')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD d b\n")
+
+                self.append_code("RESET c\n")
+
+                self.append_code("ADD e a\n")
+                self.append_code("LOAD c d\n")
+
+                self.append_code("SUB e c\n")
+
+
             # number - variable
-            if(address_b != -1):
+            else:
                 self.generate_number_at_reg(val_a, 'a')
                 self.generate_number_at_reg(address_b, 'b')
                 self.append_code("LOAD c b\n")
                 self.append_code("SUB a c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE a b\n")
+                
+                self.append_code("RESET e\n")
+                self.append_code("ADD e a\n")
 
         elif(address_a != -1):
+            #variable - tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(address_a, 'a')
+
+                self.generate_number_at_reg(address_b, 'b')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD d b\n")
+
+                self.append_code("RESET c\n")
+
+                self.append_code("LOAD e a\n")
+                self.append_code("LOAD c d\n")
+
+                self.append_code("SUB e c\n")
+
+
             #variable - variable
-            if(address_b != -1):
+            elif(address_b != -1):
                 self.generate_number_at_reg(address_a, 'a')
                 self.generate_number_at_reg(address_b, 'b')
                 self.append_code("LOAD c b\n")
                 self.append_code("LOAD d a\n")
                 self.append_code("SUB d c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE d b\n")
+
+                self.append_code("RESET e\n")
+                self.append_code("ADD e d\n")
+
             #variable - number
             else:
                 self.generate_number_at_reg(address_a, 'a')
                 self.generate_number_at_reg(val_b, 'b')
                 self.append_code("LOAD c a\n")
-                self.append_code("SUB a c\n")
-                self.generate_number_at_reg(self.address_for_machine_math, 'b')
-                self.append_code("STORE a b\n")
+                self.append_code("SUB c b\n")
+                
+                self.append_code("RESET e\n")
+                self.append_code("ADD e c\n")
 
-    def mul(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
-        #result in register c
-        if(val_a != -1):
-            # number * variable
-            if(address_b != -1):
-                self.append_code("RESET c\n")
-                self.generate_number_at_reg(val_a, 'a')
-                self.append_code("RESET f\n")
-                self.generate_number_at_reg(address_b, 'f')
-                self.append_code("LOAD b f\n")
+
+    def mul(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+        self.append_code("RESET a\n")
+        self.append_code("RESET b\n")
+        self.append_code("RESET c\n")
+        self.append_code("RESET d\n")
+        self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
+
+        if(left_index_address != -1):
+            self.generate_number_at_reg(address_a, 'a')
+            self.generate_number_at_reg(left_index_address, 'b')
+
+            self.append_code("LOAD c b\n")
+            self.append_code("ADD a c\n")
+            self.append_code("LOAD e a\n")
+            self.append_code("RESET a\n")
+            self.append_code("ADD a e\n")
+            
+            self.append_code("RESET c\n")
+            self.append_code("RESET b\n")
+
+            #tab(a) * tab(b)
+            if(right_index_address != -1):
+
+                self.generate_number_at_reg(address_b, 'b')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD b d\n")
+
+                self.append_code("LOAD f b\n")
+                self.append_code("RESET b\n")
+                self.append_code("ADD b f\n")
+
+
+            #tab(b) * variable
+            elif(address_b != -1):
+                self.generate_number_at_reg(address_b, 'b')
+
+                self.append_code("LOAD c b\n")
+                self.append_code("RESET b\n")
+                self.append_code("ADD b c\n")
+
+            #tab(a) * value
+            elif(val_b != -1):
+                self.generate_number_at_reg(val_b, 'b')
 
         elif(address_a != -1):
             #variable * variable
@@ -99,9 +266,10 @@ class CodeGenerator():
                 self.append_code("RESET f\n")
                 self.generate_number_at_reg(val_b, 'b')
 
-        self.carry_out_multiplication_algorithm('a','b','c')
+        self.carry_out_multiplication_algorithm('a','b','e')
 
     def carry_out_multiplication_algorithm(self, reg_1, reg_2, reg_result):
+        self.append_code("RESET " + str(reg_result) + "\n")
         self.append_code("JODD " + reg_2 + " 2\n")
         self.append_code("JUMP 2\n")
         self.append_code("ADD " + reg_result + " " + reg_1 + "\n")
@@ -109,52 +277,106 @@ class CodeGenerator():
         self.append_code("SHR " + reg_2 + "\n")
         self.append_code("JZERO " + reg_2 + " 2\n")
         self.append_code("JUMP -6\n")
-        self.generate_number_at_reg(self.address_for_machine_math, 'd')
-        self.append_code("STORE " + reg_result + " d\n")
                 
-    def div(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
+    def div(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+
         self.append_code("RESET a\n")
         self.append_code("RESET b\n")
         self.append_code("RESET c\n")
         self.append_code("RESET d\n")
         self.append_code("RESET e\n")
-        if(val_a != -1):
+        self.append_code("RESET f\n")
+
+        if(left_index_address != -1):
+            self.generate_number_at_reg(address_a, 'f')
+            self.generate_number_at_reg(left_index_address, 'b')
+
+            self.append_code("LOAD c b\n")
+            self.append_code("ADD f c\n")
+            self.append_code("LOAD a f\n")
+            
+            self.append_code("RESET c\n")
+            self.append_code("RESET b\n")
+            self.append_code("RESET f\n")
+
+            #tab(a) / tab(b)
+            if(right_index_address != -1):
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
+            #tab(a) / variable
+            elif(address_b != -1):
+                self.generate_number_at_reg(address_b, 'f')
+                self.append_code("LOAD b f\n")
+
+            #tab(a) / value
+            elif(val_b != -1):
+                self.generate_number_at_reg(val_b, 'b')
+
+        elif(val_a != -1):
+            # number / tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(val_a, 'a')
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
 
             # number / variable
-            if(address_b != -1):
-                if(val_a == 0):
-                    self.append_code("RESET a\n")
-                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
-                    self.append_code("STORE a f\n")
-                else:
-                    self.generate_number_at_reg(val_a, 'a')
-                    self.append_code("RESET f\n")
-                    self.generate_number_at_reg(address_b, 'f')
-                    self.append_code("LOAD b f\n")
-                    self.carry_out_division_algorithm('a','b','c','d','e')
+            else:
+                self.generate_number_at_reg(val_a, 'a')
+                self.generate_number_at_reg(address_b, 'f')
+                self.append_code("LOAD b f\n")
 
         elif(address_a != -1):
+            #variable / tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(address_a, 'f')
+                self.append_code("LOAD a f\n")
+                self.append_code("RESET f\n")
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
             #variable / variable
-            if(address_b != -1):
+            elif(address_b != -1):
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
                 self.append_code("RESET f\n")
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
-                self.carry_out_division_algorithm('a','b','c','d','e')
             #variable / number
             else:
                 if(val_b == 0):
-                    self.append_code("RESET a\n")
-                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
-                    self.append_code("STORE a f\n") 
+                    self.append_code("RESET e\n")
                 else:
                     self.generate_number_at_reg(address_a, 'f')
                     self.append_code("LOAD a f\n")
                     self.generate_number_at_reg(val_b, 'b')
-                    self.carry_out_division_algorithm('a','b','c','d','e')
+
+        self.carry_out_division_algorithm('a','b','c','d','e')             
+
     
     def carry_out_division_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
+        self.append_code("RESET " + str(quotient) + "\n")
+        self.append_code("RESET " + str(counter) + "\n")
+        self.append_code("RESET " + str(reg_tmp) + "\n")
+
         self.append_code("JZERO " + str(reg_1) + " 26\n")
         self.append_code("JZERO " + str(reg_2) + " 25\n")
 
@@ -187,55 +409,108 @@ class CodeGenerator():
         self.append_code("DEC " + str(counter)+ "\n")
         self.append_code("JZERO " + str(counter)+ " 2\n")
         self.append_code("JUMP -13\n")
-        self.generate_number_at_reg(self.address_for_machine_math, 'f')
-        self.append_code("STORE " + str(quotient)+ " f\n")
+
+        self.append_code("RESET e\n")
+        self.append_code("ADD e " + str(quotient) + "\n")
                 
     
-    def mod(self, val_a = -1, address_a = -1, val_b = -1, address_b = -1):
+    def mod(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+
         self.append_code("RESET a\n")
         self.append_code("RESET b\n")
         self.append_code("RESET c\n")
         self.append_code("RESET d\n")
         self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
 
-        if(val_a != -1):
+        if(left_index_address != -1):
+            self.generate_number_at_reg(address_a, 'f')
+            self.generate_number_at_reg(left_index_address, 'b')
 
-            # number % variable
-            if(address_b != -1):
-                if(val_a == 0):
-                    self.append_code("RESET a\n")
-                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
-                    self.append_code("STORE a f\n")
-                else:
-                    self.generate_number_at_reg(val_a, 'a')
-                    self.append_code("RESET f\n")
-                    self.generate_number_at_reg(address_b, 'f')
-                    self.append_code("LOAD b f\n")
-                    self.carry_out_modulo_algorithm('a','b','c','d','e')
+            self.append_code("LOAD c b\n")
+            self.append_code("ADD f c\n")
+            self.append_code("LOAD a f\n")
+            
+            self.append_code("RESET c\n")
+            self.append_code("RESET b\n")
+            self.append_code("RESET f\n")
+
+            #tab(a) / tab(b)
+            if(right_index_address != -1):
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
+            #tab(a) / variable
+            elif(address_b != -1):
+                self.generate_number_at_reg(address_b, 'f')
+                self.append_code("LOAD b f\n")
+
+            #tab(a) / value
+            elif(val_b != -1):
+                self.generate_number_at_reg(val_b, 'b')
+
+        elif(val_a != -1):
+            # number / tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(val_a, 'a')
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
+            # number / variable
+            else:
+                self.generate_number_at_reg(val_a, 'a')
+                self.generate_number_at_reg(address_b, 'f')
+                self.append_code("LOAD b f\n")
 
         elif(address_a != -1):
-            #variable % variable
-            if(address_b != -1):
+            #variable / tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(address_a, 'f')
+                self.append_code("LOAD a f\n")
+                self.append_code("RESET f\n")
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
+            #variable / variable
+            elif(address_b != -1):
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
                 self.append_code("RESET f\n")
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
-                self.carry_out_modulo_algorithm('a','b','c','d','e')
-            #variable % number
+            #variable / number
             else:
                 if(val_b == 0):
-                    self.append_code("RESET a\n")
-                    self.generate_number_at_reg(self.address_for_machine_math, 'f')
-                    self.append_code("STORE a f\n")
+                    self.append_code("RESET e\n")
                 else:
                     self.generate_number_at_reg(address_a, 'f')
                     self.append_code("LOAD a f\n")
                     self.generate_number_at_reg(val_b, 'b')
-                    self.carry_out_modulo_algorithm('a','b','c','d','e')
+
+        self.carry_out_modulo_algorithm('a','b','c','d','e')    
 
     def carry_out_modulo_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
-        self.generate_number_at_reg(self.address_for_machine_math, 'f')
+        self.append_code("RESET " + str(quotient) + "\n")
+        self.append_code("RESET " + str(counter) + "\n")
+        self.append_code("RESET " + str(reg_tmp) + "\n")
 
         self.append_code("JZERO " + str(reg_1) + " 31\n")
         self.append_code("JZERO " + str(reg_2) + " 30\n")
@@ -280,10 +555,16 @@ class CodeGenerator():
         self.append_code("RESET " + str(reg_1) + "\n")
         self.append_code("JUMP 2\n")
         self.append_code("INC " + str(reg_1) + "\n")
-        self.append_code("STORE " + str(reg_1) + " f\n")
+
+        self.append_code("RESET e \n")
+        self.append_code("ADD e " + str(reg_1) + "\n")
 
     #Conditions ------------------------------------------------------------
-    def equals(self, val_a=-1, address_a=-1, is_a_tab=False, val_b=-1, address_b=-1, is_b_tab=False):
+    def equals(self,
+            val_a=-1, address_a=-1, left_index_address=-1,
+            val_b=-1, address_b=-1, right_index_address=-1
+            ):
+
         if(val_a != -1):
             # number [=] variable
             if(address_b != -1):
@@ -397,8 +678,7 @@ class CodeGenerator():
 
     def store_value_from_reg_at_address(self, address, reg):
         self.generate_number_at_reg(address, 'a')
-        self.append_code("LOAD c " + str(reg) + "\n")
-        self.append_code("STORE c a\n")
+        self.append_code("STORE " + str(reg) + " a\n")
     
     def store_from_address_to_address(self, address_a, address_b, _print=False):
         self.append_code("RESET a\n")
@@ -475,6 +755,22 @@ class CodeGenerator():
         self.append_code("LOAD f d\n")
         self.append_code("ADD c f\n")
         self.append_code("STORE e c\n")
+
+    def store_from_reg_to_unknown_index(self, reg, tab_address, index_address):
+        #Value in reg e!
+        self.append_code("RESET a\n")
+        self.append_code("RESET b\n")
+        self.append_code("RESET c\n")
+
+        self.generate_number_at_reg(tab_address, 'a')
+        self.generate_number_at_reg(index_address, 'b')
+
+        self.append_code("LOAD c b\n")
+
+        self.append_code("ADD a c\n")
+
+        self.append_code("STORE e a\n")
+
 
     def get_generated_code(self):
         self.generated_code.append("HALT")
