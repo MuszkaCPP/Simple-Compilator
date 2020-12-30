@@ -5,13 +5,18 @@ BEGIN
     READ a;
     READ b;
     READ c;
-    t(1):= 11;
+    t(1):=11;
     tab(b):=11;
-    tab(c):=50;
+    
+    IF tab(b)!=t(1) THEN
+        WRITE 1;
+        WRITE 2;
+    ENDIF
 
-    t(a):= 2%t(1); [1]
-    t(3):= 49%tab(c); [6]
+    IF 2!=tab(b) THEN
+        WRITE 3;
+        WRITE 4;
+    ENDIF
 
-    WRITE t(a);
-    WRITE t(3);
+
 END

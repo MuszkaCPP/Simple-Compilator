@@ -688,6 +688,7 @@ def p_condition(p):
     condition = ""
     left_index = 0
     right_index = 0
+    machine_condition_values = []
 
     #Machine conditions
     if(symbol_exists(p[3])):
@@ -727,6 +728,10 @@ def p_condition(p):
             p[1] = get_symbol_by_name(p[1]).get_tab_symbol_value(tab_indexes.pop())
         elif(symbol_exists(p[1])):
             p[1] = get_symbol_by_name(p[1]).get_symbol_value()
+
+    if(machine_condition):
+        machine_condition_values.append(p[1])
+        machine_condition_values.append(p[3])
 
     if p[2] == '=':
         if(machine_condition):
@@ -789,95 +794,134 @@ def p_condition(p):
 
     if(machine_condition):
         if(left_is_var):
-            left_symbol = get_symbol_by_name(p[1])
+            left_symbol = get_symbol_by_name(machine_condition_values[0])
+            left_symbol_address = left_symbol.get_address()
 
-            if(is_tab(p[1])):
+            if(left_symbol.is_tab):
                 if(right_is_var):
-                    right_symbol = get_symbol_by_name(p[3])
+                    right_symbol = get_symbol_by_name(machine_condition_values[1])
+                    right_symbol_address = right_symbol.get_address()
+                    #tab(a) [?] tab(b)
+                    if(right_symbol.is_tab):
+                        right_index = tab_indexes.pop()
+                        left_index = tab_indexes.pop()
 
-                    #tab(a) [=] t(b)
-                    if(is_tab(p[3])):
-                        right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                        right_address = right_symbol.get_tab_index_address(right_index_address)
+                        if(right_index == -1):
+                            right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        else:
+                            right_index_address = 0
+                            right_symbol_address += right_index
 
-                        left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                        left_address = left_symbol.get_tab_index_address(left_index_address)
-                        
+                        if(left_index == -1):
+                            left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        else:
+                            left_index_address = 0
+                            left_symbol_address += left_index
+
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
-                            address_a=left_address,
-                            address_b=right_address
+                            address_a=left_symbol_address,
+                            left_index_address=left_index_address,
+                            address_b=right_symbol_address,
+                            right_index_address= right_index_address
                         )
-                    #tab(a) [=] b
+                    #tab(a) [?] variable
                     else:
-                        right_address = right_symbol.get_address()
-                        left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                        left_address = left_symbol.get_tab_index_address(left_index_address)
+                        left_index = tab_indexes.pop()
+                        if(left_index == -1):
+                            left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        else:
+                            left_index_address = 0
+                            left_symbol_address += left_index
 
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
-                            address_a=left_address,
-                            address_b= right_address
+                            address_a=left_symbol_address,
+                            left_index_address=left_index_address,
+                            address_b=right_symbol_address
                         )
+
+                #tab(a) [?] value
                 else:
-                    #tab(a) [=] value
-                    right_value = p[3]
-                    left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                    left_address = left_symbol.get_tab_index_address(left_index_address)
+                    left_index = tab_indexes.pop()
+                    if(left_index == -1):
+                        left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                    else:
+                        left_index_address = 0
+                        left_symbol_address += left_index
+
+                    right_value = machine_condition_values[1]
 
                     machine_conditions_manager.carry_out_condition(
                         condition=condition,
-                        address_a=left_address,
+                        address_a=left_symbol_address,
+                        left_index_address=left_index_address,
                         val_b=right_value
                     )
             else:
-                left_address = left_symbol.get_address()
-
                 if(right_is_var):
-                    right_symbol = get_symbol_by_name(p[3])
-                    
-                    if(is_tab(p[3])):
-                        pass
-                    else:
-                        right_address = right_symbol.get_address()
+                    right_symbol = get_symbol_by_name(machine_condition_values[1])
+                    right_symbol_address = right_symbol.get_address()
+
+                    #variable [?] tab(i)
+                    if(right_symbol.is_tab):
+                        right_index = tab_indexes.pop()
+                        
+                        if(right_index == -1):
+                            right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        else:
+                            right_index_address = 0
+                            right_symbol_address += right_index
 
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
-                            address_a=left_address,
-                            address_b=right_address
+                            address_a=left_symbol_address,
+                            address_b=right_symbol_address,
+                            right_index_address=right_index_address
                         )
+                    #variable [?] variable
+                    else:
+                        machine_conditions_manager.carry_out_condition(
+                            condition=condition,
+                            address_a=get_symbol_address(machine_condition_values[0]),
+                            address_b=get_symbol_address(machine_condition_values[1])
+                        )
+                #variable [?] number
                 else:
-                    right_value = p[3]
-
                     machine_conditions_manager.carry_out_condition(
                         condition=condition,
-                        address_a=left_address,
-                        val_b = right_value
+                        address_a=get_symbol_address(machine_condition_values[0]),
+                        val_b = machine_condition_values[1]
                     )
-                    
         else:
+            
             if(right_is_var):
-                #value = tab(a)
-                right_symbol = get_symbol_by_name(p[3])
-                left_value = p[1]
+                right_symbol = get_symbol_by_name(machine_condition_values[1])
+                right_symbol_address = right_symbol.get_address()
+                left_value = machine_condition_values[0]
 
-                if(is_tab(p[3])):
-                    right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                    right_address = right_symbol.get_tab_index_address(right_index_address)
+                #number [?] tab(i)
+                if(right_symbol.is_tab):
+                    right_index = tab_indexes.pop()
+                        
+                    if(right_index == -1):
+                        right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                    else:
+                        right_index_address = 0
+                        right_symbol_address += right_index
 
                     machine_conditions_manager.carry_out_condition(
                         condition=condition,
                         val_a=left_value,
-                        address_b=right_address
+                        address_b=right_symbol_address,
+                        right_index_address=right_index_address,
                     )
-                #value = a
+                #number [?] variable
                 else:
-                    right_address = right_symbol.get_address()
-
                     machine_conditions_manager.carry_out_condition(
                         condition=condition,
-                        val_a=left_value,
-                        address_b=right_address
+                        val_a = machine_condition_values[0],
+                        address_b=right_symbol_address
                     )
 
     left_is_var = False

@@ -11,7 +11,8 @@ class MachineMathManager():
                             val_b=-1,
                             address_b=-1,
                             right_index_address=-1,
-                            ):
+        ):
+
         if(operation=='+'):
             #tab(a) + tab(b)
             if(address_a != -1
@@ -80,7 +81,6 @@ class MachineMathManager():
             #value + variable
             elif(val_a != -1 and address_b != -1):
                 self.code_generator.add(address_a=address_b, val_b=val_a)
-
 
         elif(operation=='-'):
             #tab(a) - tab(b)
