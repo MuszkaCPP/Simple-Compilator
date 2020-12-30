@@ -651,7 +651,12 @@ class CodeGenerator():
             self.check_registers_inequality('a', 'b')
         elif(condition=="<"):
             self.check_registers_lower_than('a', 'b')
-
+        elif(condition==">"):
+            self.check_registers_lower_than('b', 'a')
+        elif(condition=="<="):
+            self.check_registers_lower_equals('a', 'b')
+        elif(condition==">="):
+            self.check_registers_lower_equals('b', 'a')
     
     def replace_jump_for_condition(self):
         current_code_length = len(self.generated_code)
@@ -689,6 +694,18 @@ class CodeGenerator():
         self.append_code("INC " + str(reg_1) + "\n")
         self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
         self.append_code("JZERO " + str(reg_1) + " 2\n") #--> if b>a JUMP
+
+        self.append_code(" \n")
+        self.length_before_jump = len(self.generated_code)
+
+    def check_registers_lower_equals(self, reg_1, reg_2):
+        self.append_code("INC " + str(reg_1) + "\n")
+        self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
+        self.append_code("JZERO " + str(reg_1) + " 4\n") #--> if b>a JUMP
+
+        self.append_code("DEC " + str(reg_1) + "\n")
+
+        self.append_code("JZERO " + str(reg_1) + " 2\n") #--> JUMP if True
 
         self.append_code(" \n")
         self.length_before_jump = len(self.generated_code)

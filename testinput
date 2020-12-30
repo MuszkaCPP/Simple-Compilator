@@ -8,35 +8,35 @@ BEGIN
     t(1):=12;
     tab(b):=11;
     
-    IF tab(b)<t(1) THEN
+    IF tab(b)>=t(1) THEN
         WRITE 1;
     ENDIF
 
-    IF tab(b)<c THEN
+    IF tab(b)>=c THEN
         WRITE 2;
     ENDIF
 
-    IF b<tab(b) THEN
+    IF b>=tab(b) THEN
         WRITE 3;
     ENDIF
 
-    IF tab(b)<11 THEN
+    IF tab(b)>=11 THEN
         WRITE 4;
     ENDIF
 
-    IF 10<tab(b) THEN
+    IF 10>=tab(b) THEN
         WRITE 5;
     ENDIF
 
-    IF c<b THEN
+    IF c>=b THEN
         WRITE 6;
     ENDIF
 
-    IF c<10 THEN
+    IF c>=10 THEN
         WRITE 7;
     ENDIF
 
-    IF 11<b THEN
+    IF 11>=b THEN
         WRITE 8;
     ENDIF
 
