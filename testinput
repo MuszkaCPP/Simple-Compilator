@@ -8,7 +8,7 @@ BEGIN
     t(1):=11;
     tab(b):=11;
     
-    IF tab(b)!=t(1) THEN
+    IF tab(b)=t(1) THEN
         WRITE 1;
         WRITE 2;
     ENDIF

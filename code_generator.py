@@ -559,9 +559,10 @@ class CodeGenerator():
         self.append_code("ADD e " + str(reg_1) + "\n")
 
     #Conditions ------------------------------------------------------------
-    def equals(self,
+    def check_condition(self,
             val_a=-1, address_a=-1, left_index_address=-1,
-            val_b=-1, address_b=-1, right_index_address=-1
+            val_b=-1, address_b=-1, right_index_address=-1,
+            condition=""
             ):
         self.append_code("RESET a\n")
         self.append_code("RESET b\n")
@@ -614,8 +615,13 @@ class CodeGenerator():
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
                 self.generate_number_at_reg(val_b, 'b')
-                
-        self.check_registers_equality('a', 'b')
+        
+        if(condition=="="):
+            self.check_registers_equality('a', 'b')
+        elif(condition=="!="):
+            self.check_registers_inequality('a', 'b')
+        elif(condition=="<"):
+            pass
 
     
     def replace_jump_for_condition(self):
@@ -637,64 +643,6 @@ class CodeGenerator():
         self.append_code(" \n")
         self.length_before_jump = len(self.generated_code)
 
-    def not_equals(self,
-            val_a=-1, address_a=-1, left_index_address=-1,
-            val_b=-1, address_b=-1, right_index_address=-1
-            ):
-        self.append_code("RESET a\n")
-        self.append_code("RESET b\n")
-        self.append_code("RESET c\n")
-        self.append_code("RESET d\n")
-        self.append_code("RESET e\n")
-        self.append_code("RESET f\n")
-
-        if(left_index_address != -1):
-            self.generate_number_at_reg(address_a, 'f')
-            self.generate_number_at_reg(left_index_address, 'b')
-
-            self.append_code("LOAD c b\n")
-            self.append_code("ADD f c\n")
-            self.append_code("LOAD a f\n")
-            
-            self.append_code("RESET c\n")
-            self.append_code("RESET b\n")
-            self.append_code("RESET f\n")
-
-            #tab(a) ?[=] tab(b)
-            if(right_index_address != -1):
-
-                self.generate_number_at_reg(address_b, 'f')
-                self.generate_number_at_reg(right_index_address, 'c')
-
-                self.append_code("LOAD d c\n")
-                self.append_code("ADD f d\n")
-                self.append_code("LOAD b f\n")
-
-            #tab(a) ?[=] variable
-            elif(address_b != -1):
-                self.generate_number_at_reg(address_b, 'f')
-                self.append_code("LOAD b f\n")
-
-            #tab(a) ?[=] value
-            elif(val_b != -1):
-                self.generate_number_at_reg(val_b, 'b')
-
-        elif(address_a != -1):
-            #variable ?[=] variable
-            if(address_b != -1):
-                self.generate_number_at_reg(address_a, 'f')
-                self.append_code("LOAD a f\n")
-                self.append_code("RESET f\n")
-                self.generate_number_at_reg(address_b, 'f')
-                self.append_code("LOAD b f\n")
-            #variable ?[=] number
-            else:
-                self.generate_number_at_reg(address_a, 'f')
-                self.append_code("LOAD a f\n")
-                self.generate_number_at_reg(val_b, 'b')
-
-        self.check_registers_inequality('a','b')
-
     def check_registers_inequality(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
         self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
@@ -707,6 +655,16 @@ class CodeGenerator():
 
         self.append_code(" \n")
         self.length_before_jump = len(self.generated_code)
+
+    def check_registers_lower_than(self, reg_1, reg_2):
+        self.append_code("INC " + str(reg_1) + "\n")
+        self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
+        self.append_code("JZERO " + str(reg_1) + " 2\n") #--> if b>a JUMP
+
+        self.append_code(" \n")
+        self.length_before_jump = len(self.generated_code)
+
+
     #-----------------------------------------------------------------------
 
 
