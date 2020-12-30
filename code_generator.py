@@ -437,7 +437,7 @@ class CodeGenerator():
             self.append_code("RESET b\n")
             self.append_code("RESET f\n")
 
-            #tab(a) / tab(b)
+            #tab(a) % tab(b)
             if(right_index_address != -1):
 
                 self.generate_number_at_reg(address_b, 'f')
@@ -447,17 +447,17 @@ class CodeGenerator():
                 self.append_code("ADD f d\n")
                 self.append_code("LOAD b f\n")
 
-            #tab(a) / variable
+            #tab(a) % variable
             elif(address_b != -1):
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
 
-            #tab(a) / value
+            #tab(a) % value
             elif(val_b != -1):
                 self.generate_number_at_reg(val_b, 'b')
 
         elif(val_a != -1):
-            # number / tab(a)
+            # number % tab(a)
             if(right_index_address != -1):
                 self.generate_number_at_reg(val_a, 'a')
 
@@ -468,14 +468,14 @@ class CodeGenerator():
                 self.append_code("ADD f d\n")
                 self.append_code("LOAD b f\n")
 
-            # number / variable
+            # number % variable
             else:
                 self.generate_number_at_reg(val_a, 'a')
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
 
         elif(address_a != -1):
-            #variable / tab(a)
+            #variable % tab(a)
             if(right_index_address != -1):
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
@@ -488,14 +488,14 @@ class CodeGenerator():
                 self.append_code("ADD f d\n")
                 self.append_code("LOAD b f\n")
 
-            #variable / variable
+            #variable % variable
             elif(address_b != -1):
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
                 self.append_code("RESET f\n")
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
-            #variable / number
+            #variable % number
             else:
                 if(val_b == 0):
                     self.append_code("RESET e\n")
@@ -583,7 +583,7 @@ class CodeGenerator():
             self.append_code("RESET b\n")
             self.append_code("RESET f\n")
 
-            #tab(a) ?[=] tab(b)
+            #tab(a) ? tab(b)
             if(right_index_address != -1):
 
                 self.generate_number_at_reg(address_b, 'f')
@@ -593,24 +593,53 @@ class CodeGenerator():
                 self.append_code("ADD f d\n")
                 self.append_code("LOAD b f\n")
 
-            #tab(a) ?[=] variable
+            #tab(a) ? variable
             elif(address_b != -1):
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
 
-            #tab(a) ?[=] value
+            #tab(a) ? value
             elif(val_b != -1):
                 self.generate_number_at_reg(val_b, 'b')
 
+        elif(val_a != -1):
+            # number ? tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(val_a, 'a')
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+
+            # number ? variable
+            else:
+                self.generate_number_at_reg(val_a, 'a')
+                self.generate_number_at_reg(address_b, 'f')
+                self.append_code("LOAD b f\n")
         elif(address_a != -1):
-            #variable ?[=] variable
-            if(address_b != -1):
+            #variable % tab(a)
+            if(right_index_address != -1):
+                self.generate_number_at_reg(address_a, 'f')
+                self.append_code("LOAD a f\n")
+                self.append_code("RESET f\n")
+
+                self.generate_number_at_reg(address_b, 'f')
+                self.generate_number_at_reg(right_index_address, 'c')
+
+                self.append_code("LOAD d c\n")
+                self.append_code("ADD f d\n")
+                self.append_code("LOAD b f\n")
+            #variable ? variable
+            elif(address_b != -1):
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
                 self.append_code("RESET f\n")
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
-            #variable ?[=] number
+            #variable ? number
             else:
                 self.generate_number_at_reg(address_a, 'f')
                 self.append_code("LOAD a f\n")
@@ -621,7 +650,7 @@ class CodeGenerator():
         elif(condition=="!="):
             self.check_registers_inequality('a', 'b')
         elif(condition=="<"):
-            pass
+            self.check_registers_lower_than('a', 'b')
 
     
     def replace_jump_for_condition(self):
@@ -663,7 +692,6 @@ class CodeGenerator():
 
         self.append_code(" \n")
         self.length_before_jump = len(self.generated_code)
-
 
     #-----------------------------------------------------------------------
 
