@@ -526,22 +526,19 @@ def p_command_all(p):
 def p_command_if_else(p):
     'command : IF if_occured condition THEN commands ELSE commands ENDIF'
 
-    global in_if_statement, machine_condition
+    global in_if_statement, machine_conditions
 
     in_if_statement = False
-    if(machine_condition):
-        machine_condition = False
+    if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
 
 def p_command_if_endif(p):
     'command : IF if_occured condition  THEN  commands  ENDIF'
 
-    global in_if_statement, machine_condition
+    global in_if_statement, machine_conditions
 
     in_if_statement = False
-
-    if(machine_condition):
-        machine_condition = False
+    if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
     
 
@@ -682,9 +679,11 @@ def p_condition(p):
                  | value LEQ value
                  | value GEQ value'''
 
-    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes, machine_condition
+    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes, machine_conditions
     left_is_var = False
     right_is_var = False
+    if_passed = False
+    machine_condition = False
     condition = ""
     left_index = 0
     right_index = 0
@@ -730,8 +729,11 @@ def p_condition(p):
             p[1] = get_symbol_by_name(p[1]).get_symbol_value()
 
     if(machine_condition):
+        machine_conditions.append(True)
         machine_condition_values.append(p[1])
         machine_condition_values.append(p[3])
+    else:
+        machine_conditions.append(False)
 
     if p[2] == '=':
         if(machine_condition):
@@ -973,7 +975,7 @@ machine_math_values = []
 
 in_if_statement = False
 if_passed = False
-machine_condition = False
+machine_conditions = []
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

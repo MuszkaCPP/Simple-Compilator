@@ -1,45 +1,32 @@
-
 DECLARE
-    a, b, c, t(0:3), tab(0:3)
+	a, b, t(0:6)
 BEGIN
-    READ a;
-    READ b;
-    READ c;
-    t(1):=12;
-    tab(b):=11;
-    
-    IF tab(b)>=t(1) THEN
-        WRITE 1;
-    ENDIF
-
-    IF tab(b)>=c THEN
-        WRITE 2;
-    ENDIF
-
-    IF b>=tab(b) THEN
-        WRITE 3;
-    ENDIF
-
-    IF tab(b)>=11 THEN
-        WRITE 4;
-    ENDIF
-
-    IF 10>=tab(b) THEN
-        WRITE 5;
-    ENDIF
-
-    IF c>=b THEN
-        WRITE 6;
-    ENDIF
-
-    IF c>=10 THEN
-        WRITE 7;
-    ENDIF
-
-    IF 11>=b THEN
-        WRITE 8;
-    ENDIF
-
-
-
+	READ a;
+	READ b;
+	t(0) := b+1;
+	t(1) := b+2;
+	t(2) := b+3;
+	t(3) := b+4;
+	t(4) := b+5;
+	WRITE a;
+	IF t(a) < t(b) THEN
+		WRITE b;
+		IF a < b THEN
+			WRITE t(0);
+			IF a < b THEN
+				WRITE t(a);
+				IF 0 > 3333 THEN
+					t(4) := t(a) + t(1);
+					WRITE t(2);
+				ENDIF
+			ENDIF
+		ENDIF
+		IF a < b THEN
+			WRITE t(3);
+			IF 1 < 1 THEN
+				WRITE t(4);
+			ENDIF
+		ENDIF
+	ENDIF
+	WRITE t(4);
 END

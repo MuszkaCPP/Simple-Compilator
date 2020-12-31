@@ -7,8 +7,7 @@ class CodeGenerator():
         self.current_data_offset = 0
         self.generated_code = []
         self.address_for_machine_math = 0
-        self.condition_jump_index = 0
-        self.length_before_jump = 0
+        self.length_before_jump = []
 
     # Math
     def add(self,
@@ -660,10 +659,11 @@ class CodeGenerator():
     
     def replace_jump_for_condition(self):
         current_code_length = len(self.generated_code)
-        code_length_increase = current_code_length - self.length_before_jump
+        length_before_jump = self.length_before_jump.pop()
+        code_length_increase = current_code_length - length_before_jump
         jump_value = code_length_increase + 1
 
-        self.generated_code[self.length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
+        self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
 
     def check_registers_equality(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
@@ -675,7 +675,7 @@ class CodeGenerator():
         self.append_code("JZERO " + str(reg_1) + " 2\n") #--> JUMP if True
 
         self.append_code(" \n")
-        self.length_before_jump = len(self.generated_code)
+        self.length_before_jump.append(len(self.generated_code))
 
     def check_registers_inequality(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
@@ -688,7 +688,7 @@ class CodeGenerator():
         self.append_code("JUMP 2\n") #--> JUMP if True
 
         self.append_code(" \n")
-        self.length_before_jump = len(self.generated_code)
+        self.length_before_jump.append(len(self.generated_code))
 
     def check_registers_lower_than(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
@@ -696,7 +696,7 @@ class CodeGenerator():
         self.append_code("JZERO " + str(reg_1) + " 2\n") #--> if b>a JUMP
 
         self.append_code(" \n")
-        self.length_before_jump = len(self.generated_code)
+        self.length_before_jump.append(len(self.generated_code))
 
     def check_registers_lower_equals(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
@@ -708,7 +708,7 @@ class CodeGenerator():
         self.append_code("JZERO " + str(reg_1) + " 2\n") #--> JUMP if True
 
         self.append_code(" \n")
-        self.length_before_jump = len(self.generated_code)
+        self.length_before_jump.append(len(self.generated_code))
 
     #-----------------------------------------------------------------------
 
