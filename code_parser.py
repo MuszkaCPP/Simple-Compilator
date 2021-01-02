@@ -171,9 +171,9 @@ def p_commands(p):
 def p_command_read(p):
     'command : READ identifier SEMICOLON'
 
-    global tab_indexes, last_read_symbols
+    global tab_indexes, last_read_symbols, if_passes
 
-    if(in_if_statement and not if_passed):
+    if(in_if_statement and not if_passes[-1]):
         return
 
     symbol = get_symbol_by_name(p[2])
@@ -196,9 +196,9 @@ def p_command_read(p):
 def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
-    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, machine_math, last_read_symbols
+    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, machine_math, last_read_symbols,if_passes
 
-    if(in_if_statement and not if_passed):
+    if(in_if_statement and not if_passes[-1]):
         return
 
     #Machine math
@@ -524,13 +524,30 @@ def p_command_all(p):
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
 
 def p_command_if_else(p):
-    'command : IF if_occured condition THEN commands ELSE commands ENDIF'
+    'command : IF if_occured condition THEN commands ELSE else_occured commands ENDIF'
 
-    global in_if_statement, machine_conditions
+    global in_if_statement, machine_conditions, else_occured
 
     in_if_statement = False
+    if_passes.pop()
+
     if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
+
+def p_command_else_occured(p):
+    'else_occured :'
+    global if_passes, else_occured
+    else_occured = True
+
+    if(if_passes.pop() is True):
+        if_passes.append(False)
+    else:
+        if_passes.append(True)
+
+
+    #ZACZAC OD ELSE DLA PARSERA!!!!!!!!!!!!!!!!!
+    if(machine_conditions[-1]):
+        code_generator.replace_jump_for_condition(pop=False)
 
 def p_command_if_endif(p):
     'command : IF if_occured condition  THEN  commands  ENDIF'
@@ -538,10 +555,10 @@ def p_command_if_endif(p):
     global in_if_statement, machine_conditions
 
     in_if_statement = False
+    if_passes.pop()
+
     if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
-    
-
 
 def p_if_occured(p):
     "if_occured :"
@@ -552,11 +569,11 @@ def p_if_occured(p):
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
 
-    global tab_indexes, last_read_symbols, in_if_statement, if_passed
+    global tab_indexes, last_read_symbols, in_if_statement, if_passes
 
-    if(in_if_statement and not if_passed):
+    if(in_if_statement and not if_passes[-1]):
         return
-
+        
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
             index = tab_indexes.pop()
@@ -679,10 +696,9 @@ def p_condition(p):
                  | value LEQ value
                  | value GEQ value'''
 
-    global in_if_statement, if_passed, machine_conditions_manager, tab_indexes, machine_conditions
+    global in_if_statement, if_passes, machine_conditions_manager, tab_indexes, machine_conditions
     left_is_var = False
     right_is_var = False
-    if_passed = False
     machine_condition = False
     condition = ""
     left_index = 0
@@ -758,7 +774,7 @@ def p_condition(p):
             if(p[1] < p[3]):
                 p[0] = True
             else:
-                p[0] == False
+                p[0] = False
     elif p[2] == '>':
         if(machine_condition):
             condition = ">"
@@ -785,12 +801,15 @@ def p_condition(p):
                 p[0] = False
 
     if(in_if_statement and machine_condition):
-        if_passed = True
+        if_passes.append(True)
     elif(in_if_statement and not machine_condition):
         if(p[0] == False):
-            if_passed = False
+            if_passes.append(False)
         elif(p[0] == True):
-            if_passed = True
+            if(len(if_passes) > 0 and if_passes[-1] == False):
+                if_passes.append(False)
+            else:
+                if_passes.append(True)
 
         return
 
@@ -974,7 +993,8 @@ last_read_symbols = []
 machine_math_values = []
 
 in_if_statement = False
-if_passed = False
+if_passes = []
+else_occured = False
 machine_conditions = []
 
 def symbol_exists(pidentifier):

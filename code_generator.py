@@ -657,11 +657,23 @@ class CodeGenerator():
         elif(condition==">="):
             self.check_registers_lower_equals('b', 'a')
     
-    def replace_jump_for_condition(self):
+    def replace_jump_for_condition(self, pop=True):
+        length_before_jump = 0
         current_code_length = len(self.generated_code)
-        length_before_jump = self.length_before_jump.pop()
+
+        if(pop):
+            length_before_jump = self.length_before_jump.pop()
+        else:
+            length_before_jump = self.length_before_jump[-1]
+            self.length_before_jump[-1] += current_code_length - length_before_jump + 1
+
+
         code_length_increase = current_code_length - length_before_jump
+
         jump_value = code_length_increase + 1
+
+        if(not pop):
+            jump_value += 1
 
         self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
 
@@ -757,6 +769,7 @@ class CodeGenerator():
         self.generate_number_at_reg(offset, reg)
 
     def store_number(self, val_a, reg):
+        self.append_code("RESET " + reg + "\n")
         self.generate_number_at_reg(val_a, reg)
         self.generate_offset('f')
         self.append_code("STORE " + str(reg) + " f\n")
