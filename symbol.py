@@ -54,7 +54,6 @@ class Symbol():
         self.values[index - self.tab_offset] = value
 
 
-
     def add_unknown_value_index(self, index):
         self.unknown_values.append(index)
     

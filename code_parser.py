@@ -173,6 +173,9 @@ def p_command_read(p):
 
     global tab_indexes, last_read_symbols, if_passes
 
+    if(len(if_passes)>1 and not if_passes[-2]):
+        return
+
     if(in_if_statement and not if_passes[-1]):
         return
 
@@ -187,7 +190,7 @@ def p_command_read(p):
                 get_symbol_address(p[2])
             )
         else:
-            code_generator.read_from_reg(get_symbol_address(p[2], index),'f')
+            code_generator.read_from_reg(get_symbol_by_name(p[2]).get_tab_index_address(index),'f')
             symbol.set_tab_symbol_value_at_index(-1, index)
     else:
         code_generator.read_from_reg(get_symbol_address(p[2]),'f')
@@ -197,6 +200,9 @@ def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
     global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, machine_math, last_read_symbols,if_passes
+
+    if(len(if_passes)>1 and not if_passes[-2]):
+        return
 
     if(in_if_statement and not if_passes[-1]):
         return
@@ -528,41 +534,46 @@ def p_command_if_else(p):
 
     global in_if_statement, machine_conditions, else_occured
 
-    in_if_statement = False
-    if_passes.pop()
-
     if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
+        return
+
+    if_passes.pop()
+
+    if(len(if_passes) == 0):
+        in_if_statement = False
 
 def p_command_else_occured(p):
     'else_occured :'
     global if_passes, else_occured
-    else_occured = True
 
+
+    if(machine_conditions[-1]):
+        code_generator.replace_jump_for_condition(pop=False)
+        return
+    
     if(if_passes.pop() is True):
         if_passes.append(False)
     else:
         if_passes.append(True)
-
-
-    #ZACZAC OD ELSE DLA PARSERA!!!!!!!!!!!!!!!!!
-    if(machine_conditions[-1]):
-        code_generator.replace_jump_for_condition(pop=False)
 
 def p_command_if_endif(p):
     'command : IF if_occured condition  THEN  commands  ENDIF'
 
     global in_if_statement, machine_conditions
 
-    in_if_statement = False
-    if_passes.pop()
-
     if(machine_conditions.pop()):
         code_generator.replace_jump_for_condition()
+        return
+
+    if_passes.pop()
+
+    if(len(if_passes) == 0):
+        in_if_statement = False
 
 def p_if_occured(p):
     "if_occured :"
-
+    
     global in_if_statement
     in_if_statement = True
 
@@ -571,8 +582,12 @@ def p_command_write(p):
 
     global tab_indexes, last_read_symbols, in_if_statement, if_passes
 
-    if(in_if_statement and not if_passes[-1]):
+    if(len(if_passes)>1 and not if_passes[-2]):
         return
+
+    elif(in_if_statement and not if_passes[-1]):
+        return
+
         
     if(symbol_exists(p[2])):
         if is_tab(p[2]):
@@ -623,6 +638,8 @@ def p_expression_math(p):
         value = 0
         if(is_tab(p[3])):
             right_index = tab_indexes.pop()
+            if(get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
+                machine_math = True
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
@@ -634,6 +651,8 @@ def p_expression_math(p):
         value = 0
         if(is_tab(p[1])):
             left_index = tab_indexes.pop()
+            if(get_symbol_by_name(p[3]).get_tab_symbol_value(left_index)==-1):
+                machine_math = True
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         
@@ -711,6 +730,8 @@ def p_condition(p):
         value = 0
         if(is_tab(p[3])):
             right_index = tab_indexes.pop()
+            if(get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
+                machine_condition = True
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
@@ -722,6 +743,8 @@ def p_condition(p):
         value = 0
         if(is_tab(p[1])):
             left_index = tab_indexes.pop()
+            if(get_symbol_by_name(p[1]).get_tab_symbol_value(left_index)==-1):
+                machine_condition = True
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         

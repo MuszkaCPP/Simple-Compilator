@@ -880,12 +880,14 @@ class CodeGenerator():
         return self.generated_code
 
     def generate_value_from_adress_at_register(self, reg, address, _print=False):
+        self.append_code("RESET " + str(reg) + "\n")
         self.generate_number_at_reg(address, reg)
 
         if(_print):
             self.append_code("PUT " + str(reg) +"\n")
 
     def print_value_from_register(self, val_a, reg):
+        self.append_code("RESET f\n")
         self.generate_number_at_reg(val_a, reg)
         self.generate_offset('f')
 

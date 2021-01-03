@@ -1,66 +1,31 @@
 DECLARE
-	a, b, c, t(0:6)
+	a, b[ !,@#$%^&*{}<>?/(){{:;'"-_+=|\~` 	*} ]
 BEGIN
 	READ a;
 	READ b;
-	READ c;
-	t(0) := b+1;
-	t(1) := b+2;
-	t(2) := b+3;
-	t(3) := b+4;
-	t(4) := b+5;
-	WRITE a;
+	
+	IF a = b THEN
+		WRITE 1;
+	ENDIF
 
-	IF b < c THEN
-		IF t(a) < t(b) THEN
-			WRITE b;
-			IF a < b THEN
-				WRITE t(0);
-				IF a < b THEN
-					WRITE t(a);
-					IF 0 < 3333 THEN
-						t(4) := t(a) + t(1);					
-						IF 3333 > 3333 THEN
-							WRITE t(2);
-						ELSE
-							WRITE t(4);
-						ENDIF	
-					ENDIF
-				ENDIF
-			ENDIF
-			IF a < b THEN
-				WRITE t(3);
-				IF 1 < 1 THEN
-					WRITE t(4);
-				ENDIF
-			ENDIF
-		ENDIF
-		WRITE t(4);
-	ELSE
-		IF t(a) < t(b) THEN
-			WRITE b;
-			IF a < b THEN
-				WRITE t(0);
-				IF a < b THEN
-					WRITE t(a);
-					IF 0 > 3333 THEN
-						t(4) := t(a) + t(1);
-						IF 3333 < 3333 THEN
-							WRITE t(2);
-						ELSE
-							WRITE t(4);
-						ENDIF
-					ENDIF
-				ENDIF
-			ENDIF
-			IF a < b THEN
-				WRITE t(3);
-				IF 1 < 1 THEN
-					WRITE t(4);
-				ENDIF
-			ENDIF
-		ENDIF
-		WRITE t(4);
+	IF a != b THEN
+		WRITE 2;
+	ENDIF
+
+	IF a < b THEN  [**********///////////""""""":::::::<<:;:,;,;,;;;,;,;;,*]
+		WRITE 3;
+	ENDIF
+
+	IF a <= b THEN
+		WRITE 4;
+	ENDIF
+
+	IF a > b THEN
+		WRITE 5;
+	ENDIF
+
+	IF a >= b THEN
+		WRITE 6;
 	ENDIF
 
 END
