@@ -13,87 +13,89 @@ Rule 7     commands -> commands command
 Rule 8     commands -> command
 Rule 9     command -> READ identifier SEMICOLON
 Rule 10    command -> identifier ASSIGNMENT expression SEMICOLON
-Rule 11    command -> WHILE condition DO commands ENDWHILE
-Rule 12    command -> REPEAT commands UNTIL condition SEMICOLON
-Rule 13    command -> FOR pidentifier FROM value TO value DO commands ENDFOR
-Rule 14    command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-Rule 15    command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-Rule 16    else_occured -> <empty>
-Rule 17    command -> IF if_occured condition THEN commands ENDIF
-Rule 18    if_occured -> <empty>
-Rule 19    command -> WRITE value SEMICOLON
-Rule 20    expression -> value
-Rule 21    expression -> value ADD value
-Rule 22    expression -> value SUB value
-Rule 23    expression -> value MUL value
-Rule 24    expression -> value DIV value
-Rule 25    expression -> value MOD value
-Rule 26    condition -> value EQUALS value
-Rule 27    condition -> value NOT_EQUALS value
-Rule 28    condition -> value LOWER value
-Rule 29    condition -> value GREATER value
-Rule 30    condition -> value LEQ value
-Rule 31    condition -> value GEQ value
-Rule 32    value -> NUM
-Rule 33    value -> identifier
-Rule 34    identifier -> pidentifier
-Rule 35    identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-Rule 36    identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+Rule 11    command -> REPEAT commands UNTIL condition SEMICOLON
+Rule 12    command -> FOR pidentifier FROM value TO value DO commands ENDFOR
+Rule 13    command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+Rule 14    command -> WHILE while_occured condition DO commands ENDWHILE
+Rule 15    while_occured -> <empty>
+Rule 16    command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+Rule 17    else_occured -> <empty>
+Rule 18    command -> IF if_occured condition THEN commands ENDIF
+Rule 19    if_occured -> <empty>
+Rule 20    command -> WRITE value SEMICOLON
+Rule 21    expression -> value
+Rule 22    expression -> value ADD value
+Rule 23    expression -> value SUB value
+Rule 24    expression -> value MUL value
+Rule 25    expression -> value DIV value
+Rule 26    expression -> value MOD value
+Rule 27    condition -> value EQUALS value
+Rule 28    condition -> value NOT_EQUALS value
+Rule 29    condition -> value LOWER value
+Rule 30    condition -> value GREATER value
+Rule 31    condition -> value LEQ value
+Rule 32    condition -> value GEQ value
+Rule 33    value -> NUM
+Rule 34    value -> identifier
+Rule 35    identifier -> pidentifier
+Rule 36    identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+Rule 37    identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
 Terminals, with rules where they appear
 
-ADD                  : 21
+ADD                  : 22
 ASSIGNMENT           : 10
 BEGIN                : 1 2
 COLON                : 4 6
 COMMA                : 3 4
 DECLARE              : 1
-DIV                  : 24
-DO                   : 11 13 14
-DOWNTO               : 14
-ELSE                 : 15
+DIV                  : 25
+DO                   : 12 13 14
+DOWNTO               : 13
+ELSE                 : 16
 END                  : 1 2
-ENDFOR               : 13 14
-ENDIF                : 15 17
-ENDWHILE             : 11
-EQUALS               : 26
-FOR                  : 13 14
-FROM                 : 13 14
-GEQ                  : 31
-GREATER              : 29
-IF                   : 15 17
-LEFT_BRACKET         : 4 6 35 36
-LEQ                  : 30
-LOWER                : 28
-MOD                  : 25
-MUL                  : 23
-NOT_EQUALS           : 27
-NUM                  : 4 4 6 6 32 36
+ENDFOR               : 12 13
+ENDIF                : 16 18
+ENDWHILE             : 14
+EQUALS               : 27
+FOR                  : 12 13
+FROM                 : 12 13
+GEQ                  : 32
+GREATER              : 30
+IF                   : 16 18
+LEFT_BRACKET         : 4 6 36 37
+LEQ                  : 31
+LOWER                : 29
+MOD                  : 26
+MUL                  : 24
+NOT_EQUALS           : 28
+NUM                  : 4 4 6 6 33 37
 READ                 : 9
-REPEAT               : 12
-RIGHT_BRACKET        : 4 6 35 36
-SEMICOLON            : 9 10 12 19
-SUB                  : 22
-THEN                 : 15 17
-TO                   : 13
-UNTIL                : 12
-WHILE                : 11
-WRITE                : 19
+REPEAT               : 11
+RIGHT_BRACKET        : 4 6 36 37
+SEMICOLON            : 9 10 11 20
+SUB                  : 23
+THEN                 : 16 18
+TO                   : 12
+UNTIL                : 11
+WHILE                : 14
+WRITE                : 20
 error                : 
-pidentifier          : 3 4 5 6 13 14 34 35 35 36
+pidentifier          : 3 4 5 6 12 13 35 36 36 37
 
 Nonterminals, with rules where they appear
 
 command              : 7 8
-commands             : 1 2 7 11 12 13 14 15 15 17
-condition            : 11 12 15 17
+commands             : 1 2 7 11 12 13 14 16 16 18
+condition            : 11 14 16 18
 declarations         : 1 3 4
-else_occured         : 15
+else_occured         : 16
 expression           : 10
-identifier           : 9 10 33
-if_occured           : 15 17
+identifier           : 9 10 34
+if_occured           : 16 18
 program              : 0
-value                : 13 13 14 14 19 20 21 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30 30 31 31
+value                : 12 12 13 13 20 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30 30 31 31 32 32
+while_occured        : 14
 
 Parsing method: LALR
 
@@ -133,24 +135,24 @@ state 3
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     commands                       shift and go to state 6
     command                        shift and go to state 7
@@ -182,25 +184,25 @@ state 6
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     END             shift and go to state 19
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
@@ -211,9 +213,9 @@ state 7
 
     END             reduce using rule 8 (commands -> command .)
     READ            reduce using rule 8 (commands -> command .)
-    WHILE           reduce using rule 8 (commands -> command .)
     REPEAT          reduce using rule 8 (commands -> command .)
     FOR             reduce using rule 8 (commands -> command .)
+    WHILE           reduce using rule 8 (commands -> command .)
     IF              reduce using rule 8 (commands -> command .)
     WRITE           reduce using rule 8 (commands -> command .)
     pidentifier     reduce using rule 8 (commands -> command .)
@@ -227,11 +229,11 @@ state 7
 state 8
 
     (9) command -> READ . identifier SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     identifier                     shift and go to state 21
 
@@ -244,115 +246,103 @@ state 9
 
 state 10
 
-    (11) command -> WHILE . condition DO commands ENDWHILE
-    (26) condition -> . value EQUALS value
-    (27) condition -> . value NOT_EQUALS value
-    (28) condition -> . value LOWER value
-    (29) condition -> . value GREATER value
-    (30) condition -> . value LEQ value
-    (31) condition -> . value GEQ value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
-
-    condition                      shift and go to state 23
-    value                          shift and go to state 24
-    identifier                     shift and go to state 26
-
-state 11
-
-    (12) command -> REPEAT . commands UNTIL condition SEMICOLON
+    (11) command -> REPEAT . commands UNTIL condition SEMICOLON
     (7) commands -> . commands command
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
-    commands                       shift and go to state 27
+    commands                       shift and go to state 23
     command                        shift and go to state 7
     identifier                     shift and go to state 9
 
+state 11
+
+    (12) command -> FOR . pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> FOR . pidentifier FROM value DOWNTO value DO commands ENDFOR
+
+    pidentifier     shift and go to state 24
+
+
 state 12
 
-    (13) command -> FOR . pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> FOR . pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (35) identifier -> pidentifier .
+    (36) identifier -> pidentifier . LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> pidentifier . LEFT_BRACKET NUM RIGHT_BRACKET
 
-    pidentifier     shift and go to state 28
+    ASSIGNMENT      reduce using rule 35 (identifier -> pidentifier .)
+    SEMICOLON       reduce using rule 35 (identifier -> pidentifier .)
+    ADD             reduce using rule 35 (identifier -> pidentifier .)
+    SUB             reduce using rule 35 (identifier -> pidentifier .)
+    MUL             reduce using rule 35 (identifier -> pidentifier .)
+    DIV             reduce using rule 35 (identifier -> pidentifier .)
+    MOD             reduce using rule 35 (identifier -> pidentifier .)
+    EQUALS          reduce using rule 35 (identifier -> pidentifier .)
+    NOT_EQUALS      reduce using rule 35 (identifier -> pidentifier .)
+    LOWER           reduce using rule 35 (identifier -> pidentifier .)
+    GREATER         reduce using rule 35 (identifier -> pidentifier .)
+    LEQ             reduce using rule 35 (identifier -> pidentifier .)
+    GEQ             reduce using rule 35 (identifier -> pidentifier .)
+    TO              reduce using rule 35 (identifier -> pidentifier .)
+    DOWNTO          reduce using rule 35 (identifier -> pidentifier .)
+    DO              reduce using rule 35 (identifier -> pidentifier .)
+    THEN            reduce using rule 35 (identifier -> pidentifier .)
+    LEFT_BRACKET    shift and go to state 25
 
 
 state 13
 
-    (34) identifier -> pidentifier .
-    (35) identifier -> pidentifier . LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> pidentifier . LEFT_BRACKET NUM RIGHT_BRACKET
+    (14) command -> WHILE . while_occured condition DO commands ENDWHILE
+    (15) while_occured -> .
 
-    ASSIGNMENT      reduce using rule 34 (identifier -> pidentifier .)
-    SEMICOLON       reduce using rule 34 (identifier -> pidentifier .)
-    EQUALS          reduce using rule 34 (identifier -> pidentifier .)
-    NOT_EQUALS      reduce using rule 34 (identifier -> pidentifier .)
-    LOWER           reduce using rule 34 (identifier -> pidentifier .)
-    GREATER         reduce using rule 34 (identifier -> pidentifier .)
-    LEQ             reduce using rule 34 (identifier -> pidentifier .)
-    GEQ             reduce using rule 34 (identifier -> pidentifier .)
-    ADD             reduce using rule 34 (identifier -> pidentifier .)
-    SUB             reduce using rule 34 (identifier -> pidentifier .)
-    MUL             reduce using rule 34 (identifier -> pidentifier .)
-    DIV             reduce using rule 34 (identifier -> pidentifier .)
-    MOD             reduce using rule 34 (identifier -> pidentifier .)
-    DO              reduce using rule 34 (identifier -> pidentifier .)
-    THEN            reduce using rule 34 (identifier -> pidentifier .)
-    TO              reduce using rule 34 (identifier -> pidentifier .)
-    DOWNTO          reduce using rule 34 (identifier -> pidentifier .)
-    LEFT_BRACKET    shift and go to state 29
+    NUM             reduce using rule 15 (while_occured -> .)
+    pidentifier     reduce using rule 15 (while_occured -> .)
 
+    while_occured                  shift and go to state 26
 
 state 14
 
-    (15) command -> IF . if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> IF . if_occured condition THEN commands ENDIF
-    (18) if_occured -> .
+    (16) command -> IF . if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> IF . if_occured condition THEN commands ENDIF
+    (19) if_occured -> .
 
-    NUM             reduce using rule 18 (if_occured -> .)
-    pidentifier     reduce using rule 18 (if_occured -> .)
+    NUM             reduce using rule 19 (if_occured -> .)
+    pidentifier     reduce using rule 19 (if_occured -> .)
 
-    if_occured                     shift and go to state 30
+    if_occured                     shift and go to state 27
 
 state 15
 
-    (19) command -> WRITE . value SEMICOLON
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (20) command -> WRITE . value SEMICOLON
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
-    value                          shift and go to state 31
-    identifier                     shift and go to state 26
+    value                          shift and go to state 28
+    identifier                     shift and go to state 30
 
 state 16
 
@@ -361,26 +351,26 @@ state 16
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
-    commands                       shift and go to state 32
+    commands                       shift and go to state 31
     command                        shift and go to state 7
     identifier                     shift and go to state 9
 
@@ -389,14 +379,14 @@ state 17
     (3) declarations -> declarations COMMA . pidentifier
     (4) declarations -> declarations COMMA . pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET
 
-    pidentifier     shift and go to state 33
+    pidentifier     shift and go to state 32
 
 
 state 18
 
     (6) declarations -> pidentifier LEFT_BRACKET . NUM COLON NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 34
+    NUM             shift and go to state 33
 
 
 state 19
@@ -412,9 +402,9 @@ state 20
 
     END             reduce using rule 7 (commands -> commands command .)
     READ            reduce using rule 7 (commands -> commands command .)
-    WHILE           reduce using rule 7 (commands -> commands command .)
     REPEAT          reduce using rule 7 (commands -> commands command .)
     FOR             reduce using rule 7 (commands -> commands command .)
+    WHILE           reduce using rule 7 (commands -> commands command .)
     IF              reduce using rule 7 (commands -> commands command .)
     WRITE           reduce using rule 7 (commands -> commands command .)
     pidentifier     reduce using rule 7 (commands -> commands command .)
@@ -429,230 +419,228 @@ state 21
 
     (9) command -> READ identifier . SEMICOLON
 
-    SEMICOLON       shift and go to state 35
+    SEMICOLON       shift and go to state 34
 
 
 state 22
 
     (10) command -> identifier ASSIGNMENT . expression SEMICOLON
-    (20) expression -> . value
-    (21) expression -> . value ADD value
-    (22) expression -> . value SUB value
-    (23) expression -> . value MUL value
-    (24) expression -> . value DIV value
-    (25) expression -> . value MOD value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (21) expression -> . value
+    (22) expression -> . value ADD value
+    (23) expression -> . value SUB value
+    (24) expression -> . value MUL value
+    (25) expression -> . value DIV value
+    (26) expression -> . value MOD value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
-    identifier                     shift and go to state 26
-    expression                     shift and go to state 36
-    value                          shift and go to state 37
+    identifier                     shift and go to state 30
+    expression                     shift and go to state 35
+    value                          shift and go to state 36
 
 state 23
 
-    (11) command -> WHILE condition . DO commands ENDWHILE
-
-    DO              shift and go to state 38
-
-
-state 24
-
-    (26) condition -> value . EQUALS value
-    (27) condition -> value . NOT_EQUALS value
-    (28) condition -> value . LOWER value
-    (29) condition -> value . GREATER value
-    (30) condition -> value . LEQ value
-    (31) condition -> value . GEQ value
-
-    EQUALS          shift and go to state 39
-    NOT_EQUALS      shift and go to state 40
-    LOWER           shift and go to state 41
-    GREATER         shift and go to state 42
-    LEQ             shift and go to state 43
-    GEQ             shift and go to state 44
-
-
-state 25
-
-    (32) value -> NUM .
-
-    EQUALS          reduce using rule 32 (value -> NUM .)
-    NOT_EQUALS      reduce using rule 32 (value -> NUM .)
-    LOWER           reduce using rule 32 (value -> NUM .)
-    GREATER         reduce using rule 32 (value -> NUM .)
-    LEQ             reduce using rule 32 (value -> NUM .)
-    GEQ             reduce using rule 32 (value -> NUM .)
-    SEMICOLON       reduce using rule 32 (value -> NUM .)
-    ADD             reduce using rule 32 (value -> NUM .)
-    SUB             reduce using rule 32 (value -> NUM .)
-    MUL             reduce using rule 32 (value -> NUM .)
-    DIV             reduce using rule 32 (value -> NUM .)
-    MOD             reduce using rule 32 (value -> NUM .)
-    DO              reduce using rule 32 (value -> NUM .)
-    THEN            reduce using rule 32 (value -> NUM .)
-    TO              reduce using rule 32 (value -> NUM .)
-    DOWNTO          reduce using rule 32 (value -> NUM .)
-
-
-state 26
-
-    (33) value -> identifier .
-
-    EQUALS          reduce using rule 33 (value -> identifier .)
-    NOT_EQUALS      reduce using rule 33 (value -> identifier .)
-    LOWER           reduce using rule 33 (value -> identifier .)
-    GREATER         reduce using rule 33 (value -> identifier .)
-    LEQ             reduce using rule 33 (value -> identifier .)
-    GEQ             reduce using rule 33 (value -> identifier .)
-    SEMICOLON       reduce using rule 33 (value -> identifier .)
-    ADD             reduce using rule 33 (value -> identifier .)
-    SUB             reduce using rule 33 (value -> identifier .)
-    MUL             reduce using rule 33 (value -> identifier .)
-    DIV             reduce using rule 33 (value -> identifier .)
-    MOD             reduce using rule 33 (value -> identifier .)
-    DO              reduce using rule 33 (value -> identifier .)
-    THEN            reduce using rule 33 (value -> identifier .)
-    TO              reduce using rule 33 (value -> identifier .)
-    DOWNTO          reduce using rule 33 (value -> identifier .)
-
-
-state 27
-
-    (12) command -> REPEAT commands . UNTIL condition SEMICOLON
+    (11) command -> REPEAT commands . UNTIL condition SEMICOLON
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    UNTIL           shift and go to state 45
+    UNTIL           shift and go to state 37
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
 
+state 24
+
+    (12) command -> FOR pidentifier . FROM value TO value DO commands ENDFOR
+    (13) command -> FOR pidentifier . FROM value DOWNTO value DO commands ENDFOR
+
+    FROM            shift and go to state 38
+
+
+state 25
+
+    (36) identifier -> pidentifier LEFT_BRACKET . pidentifier RIGHT_BRACKET
+    (37) identifier -> pidentifier LEFT_BRACKET . NUM RIGHT_BRACKET
+
+    pidentifier     shift and go to state 39
+    NUM             shift and go to state 40
+
+
+state 26
+
+    (14) command -> WHILE while_occured . condition DO commands ENDWHILE
+    (27) condition -> . value EQUALS value
+    (28) condition -> . value NOT_EQUALS value
+    (29) condition -> . value LOWER value
+    (30) condition -> . value GREATER value
+    (31) condition -> . value LEQ value
+    (32) condition -> . value GEQ value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    condition                      shift and go to state 41
+    value                          shift and go to state 42
+    identifier                     shift and go to state 30
+
+state 27
+
+    (16) command -> IF if_occured . condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> IF if_occured . condition THEN commands ENDIF
+    (27) condition -> . value EQUALS value
+    (28) condition -> . value NOT_EQUALS value
+    (29) condition -> . value LOWER value
+    (30) condition -> . value GREATER value
+    (31) condition -> . value LEQ value
+    (32) condition -> . value GEQ value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    condition                      shift and go to state 43
+    value                          shift and go to state 42
+    identifier                     shift and go to state 30
+
 state 28
 
-    (13) command -> FOR pidentifier . FROM value TO value DO commands ENDFOR
-    (14) command -> FOR pidentifier . FROM value DOWNTO value DO commands ENDFOR
+    (20) command -> WRITE value . SEMICOLON
 
-    FROM            shift and go to state 46
+    SEMICOLON       shift and go to state 44
 
 
 state 29
 
-    (35) identifier -> pidentifier LEFT_BRACKET . pidentifier RIGHT_BRACKET
-    (36) identifier -> pidentifier LEFT_BRACKET . NUM RIGHT_BRACKET
+    (33) value -> NUM .
 
-    pidentifier     shift and go to state 47
-    NUM             shift and go to state 48
+    SEMICOLON       reduce using rule 33 (value -> NUM .)
+    ADD             reduce using rule 33 (value -> NUM .)
+    SUB             reduce using rule 33 (value -> NUM .)
+    MUL             reduce using rule 33 (value -> NUM .)
+    DIV             reduce using rule 33 (value -> NUM .)
+    MOD             reduce using rule 33 (value -> NUM .)
+    EQUALS          reduce using rule 33 (value -> NUM .)
+    NOT_EQUALS      reduce using rule 33 (value -> NUM .)
+    LOWER           reduce using rule 33 (value -> NUM .)
+    GREATER         reduce using rule 33 (value -> NUM .)
+    LEQ             reduce using rule 33 (value -> NUM .)
+    GEQ             reduce using rule 33 (value -> NUM .)
+    TO              reduce using rule 33 (value -> NUM .)
+    DOWNTO          reduce using rule 33 (value -> NUM .)
+    DO              reduce using rule 33 (value -> NUM .)
+    THEN            reduce using rule 33 (value -> NUM .)
 
 
 state 30
 
-    (15) command -> IF if_occured . condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> IF if_occured . condition THEN commands ENDIF
-    (26) condition -> . value EQUALS value
-    (27) condition -> . value NOT_EQUALS value
-    (28) condition -> . value LOWER value
-    (29) condition -> . value GREATER value
-    (30) condition -> . value LEQ value
-    (31) condition -> . value GEQ value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (34) value -> identifier .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    SEMICOLON       reduce using rule 34 (value -> identifier .)
+    ADD             reduce using rule 34 (value -> identifier .)
+    SUB             reduce using rule 34 (value -> identifier .)
+    MUL             reduce using rule 34 (value -> identifier .)
+    DIV             reduce using rule 34 (value -> identifier .)
+    MOD             reduce using rule 34 (value -> identifier .)
+    EQUALS          reduce using rule 34 (value -> identifier .)
+    NOT_EQUALS      reduce using rule 34 (value -> identifier .)
+    LOWER           reduce using rule 34 (value -> identifier .)
+    GREATER         reduce using rule 34 (value -> identifier .)
+    LEQ             reduce using rule 34 (value -> identifier .)
+    GEQ             reduce using rule 34 (value -> identifier .)
+    TO              reduce using rule 34 (value -> identifier .)
+    DOWNTO          reduce using rule 34 (value -> identifier .)
+    DO              reduce using rule 34 (value -> identifier .)
+    THEN            reduce using rule 34 (value -> identifier .)
 
-    condition                      shift and go to state 49
-    value                          shift and go to state 24
-    identifier                     shift and go to state 26
 
 state 31
-
-    (19) command -> WRITE value . SEMICOLON
-
-    SEMICOLON       shift and go to state 50
-
-
-state 32
 
     (1) program -> DECLARE declarations BEGIN commands . END
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    END             shift and go to state 51
+    END             shift and go to state 45
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
 
-state 33
+state 32
 
     (3) declarations -> declarations COMMA pidentifier .
     (4) declarations -> declarations COMMA pidentifier . LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET
 
     BEGIN           reduce using rule 3 (declarations -> declarations COMMA pidentifier .)
     COMMA           reduce using rule 3 (declarations -> declarations COMMA pidentifier .)
-    LEFT_BRACKET    shift and go to state 52
+    LEFT_BRACKET    shift and go to state 46
 
 
-state 34
+state 33
 
     (6) declarations -> pidentifier LEFT_BRACKET NUM . COLON NUM RIGHT_BRACKET
 
-    COLON           shift and go to state 53
+    COLON           shift and go to state 47
 
 
-state 35
+state 34
 
     (9) command -> READ identifier SEMICOLON .
 
     END             reduce using rule 9 (command -> READ identifier SEMICOLON .)
     READ            reduce using rule 9 (command -> READ identifier SEMICOLON .)
-    WHILE           reduce using rule 9 (command -> READ identifier SEMICOLON .)
     REPEAT          reduce using rule 9 (command -> READ identifier SEMICOLON .)
     FOR             reduce using rule 9 (command -> READ identifier SEMICOLON .)
+    WHILE           reduce using rule 9 (command -> READ identifier SEMICOLON .)
     IF              reduce using rule 9 (command -> READ identifier SEMICOLON .)
     WRITE           reduce using rule 9 (command -> READ identifier SEMICOLON .)
     pidentifier     reduce using rule 9 (command -> READ identifier SEMICOLON .)
@@ -663,259 +651,163 @@ state 35
     ENDFOR          reduce using rule 9 (command -> READ identifier SEMICOLON .)
 
 
-state 36
+state 35
 
     (10) command -> identifier ASSIGNMENT expression . SEMICOLON
 
-    SEMICOLON       shift and go to state 54
+    SEMICOLON       shift and go to state 48
+
+
+state 36
+
+    (21) expression -> value .
+    (22) expression -> value . ADD value
+    (23) expression -> value . SUB value
+    (24) expression -> value . MUL value
+    (25) expression -> value . DIV value
+    (26) expression -> value . MOD value
+
+    SEMICOLON       reduce using rule 21 (expression -> value .)
+    ADD             shift and go to state 49
+    SUB             shift and go to state 50
+    MUL             shift and go to state 51
+    DIV             shift and go to state 52
+    MOD             shift and go to state 53
 
 
 state 37
 
-    (20) expression -> value .
-    (21) expression -> value . ADD value
-    (22) expression -> value . SUB value
-    (23) expression -> value . MUL value
-    (24) expression -> value . DIV value
-    (25) expression -> value . MOD value
+    (11) command -> REPEAT commands UNTIL . condition SEMICOLON
+    (27) condition -> . value EQUALS value
+    (28) condition -> . value NOT_EQUALS value
+    (29) condition -> . value LOWER value
+    (30) condition -> . value GREATER value
+    (31) condition -> . value LEQ value
+    (32) condition -> . value GEQ value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    SEMICOLON       reduce using rule 20 (expression -> value .)
-    ADD             shift and go to state 55
-    SUB             shift and go to state 56
-    MUL             shift and go to state 57
-    DIV             shift and go to state 58
-    MOD             shift and go to state 59
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
+    condition                      shift and go to state 54
+    value                          shift and go to state 42
+    identifier                     shift and go to state 30
 
 state 38
 
-    (11) command -> WHILE condition DO . commands ENDWHILE
-    (7) commands -> . commands command
-    (8) commands -> . command
-    (9) command -> . READ identifier SEMICOLON
-    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (12) command -> FOR pidentifier FROM . value TO value DO commands ENDFOR
+    (13) command -> FOR pidentifier FROM . value DOWNTO value DO commands ENDFOR
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
-    IF              shift and go to state 14
-    WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
-    commands                       shift and go to state 60
-    command                        shift and go to state 7
-    identifier                     shift and go to state 9
+    value                          shift and go to state 55
+    identifier                     shift and go to state 30
 
 state 39
 
-    (26) condition -> value EQUALS . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (36) identifier -> pidentifier LEFT_BRACKET pidentifier . RIGHT_BRACKET
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    RIGHT_BRACKET   shift and go to state 56
 
-    value                          shift and go to state 61
-    identifier                     shift and go to state 26
 
 state 40
 
-    (27) condition -> value NOT_EQUALS . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (37) identifier -> pidentifier LEFT_BRACKET NUM . RIGHT_BRACKET
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    RIGHT_BRACKET   shift and go to state 57
 
-    value                          shift and go to state 62
-    identifier                     shift and go to state 26
 
 state 41
 
-    (28) condition -> value LOWER . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (14) command -> WHILE while_occured condition . DO commands ENDWHILE
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    DO              shift and go to state 58
 
-    value                          shift and go to state 63
-    identifier                     shift and go to state 26
 
 state 42
 
-    (29) condition -> value GREATER . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (27) condition -> value . EQUALS value
+    (28) condition -> value . NOT_EQUALS value
+    (29) condition -> value . LOWER value
+    (30) condition -> value . GREATER value
+    (31) condition -> value . LEQ value
+    (32) condition -> value . GEQ value
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    EQUALS          shift and go to state 59
+    NOT_EQUALS      shift and go to state 60
+    LOWER           shift and go to state 61
+    GREATER         shift and go to state 62
+    LEQ             shift and go to state 63
+    GEQ             shift and go to state 64
 
-    value                          shift and go to state 64
-    identifier                     shift and go to state 26
 
 state 43
 
-    (30) condition -> value LEQ . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (16) command -> IF if_occured condition . THEN commands ELSE else_occured commands ENDIF
+    (18) command -> IF if_occured condition . THEN commands ENDIF
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    THEN            shift and go to state 65
 
-    value                          shift and go to state 65
-    identifier                     shift and go to state 26
 
 state 44
 
-    (31) condition -> value GEQ . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (20) command -> WRITE value SEMICOLON .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    END             reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    READ            reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    REPEAT          reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    FOR             reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    WHILE           reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    IF              reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    WRITE           reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    pidentifier     reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    UNTIL           reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    ENDWHILE        reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    ELSE            reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    ENDIF           reduce using rule 20 (command -> WRITE value SEMICOLON .)
+    ENDFOR          reduce using rule 20 (command -> WRITE value SEMICOLON .)
 
-    value                          shift and go to state 66
-    identifier                     shift and go to state 26
 
 state 45
-
-    (12) command -> REPEAT commands UNTIL . condition SEMICOLON
-    (26) condition -> . value EQUALS value
-    (27) condition -> . value NOT_EQUALS value
-    (28) condition -> . value LOWER value
-    (29) condition -> . value GREATER value
-    (30) condition -> . value LEQ value
-    (31) condition -> . value GEQ value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
-
-    condition                      shift and go to state 67
-    value                          shift and go to state 24
-    identifier                     shift and go to state 26
-
-state 46
-
-    (13) command -> FOR pidentifier FROM . value TO value DO commands ENDFOR
-    (14) command -> FOR pidentifier FROM . value DOWNTO value DO commands ENDFOR
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
-
-    value                          shift and go to state 68
-    identifier                     shift and go to state 26
-
-state 47
-
-    (35) identifier -> pidentifier LEFT_BRACKET pidentifier . RIGHT_BRACKET
-
-    RIGHT_BRACKET   shift and go to state 69
-
-
-state 48
-
-    (36) identifier -> pidentifier LEFT_BRACKET NUM . RIGHT_BRACKET
-
-    RIGHT_BRACKET   shift and go to state 70
-
-
-state 49
-
-    (15) command -> IF if_occured condition . THEN commands ELSE else_occured commands ENDIF
-    (17) command -> IF if_occured condition . THEN commands ENDIF
-
-    THEN            shift and go to state 71
-
-
-state 50
-
-    (19) command -> WRITE value SEMICOLON .
-
-    END             reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    READ            reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    WHILE           reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    REPEAT          reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    FOR             reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    IF              reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    WRITE           reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    pidentifier     reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    UNTIL           reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    ENDWHILE        reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    ELSE            reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    ENDIF           reduce using rule 19 (command -> WRITE value SEMICOLON .)
-    ENDFOR          reduce using rule 19 (command -> WRITE value SEMICOLON .)
-
-
-state 51
 
     (1) program -> DECLARE declarations BEGIN commands END .
 
     $end            reduce using rule 1 (program -> DECLARE declarations BEGIN commands END .)
 
 
-state 52
+state 46
 
     (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET . NUM COLON NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 72
+    NUM             shift and go to state 66
 
 
-state 53
+state 47
 
     (6) declarations -> pidentifier LEFT_BRACKET NUM COLON . NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 73
+    NUM             shift and go to state 67
 
 
-state 54
+state 48
 
     (10) command -> identifier ASSIGNMENT expression SEMICOLON .
 
     END             reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     READ            reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
-    WHILE           reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     REPEAT          reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     FOR             reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
+    WHILE           reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     IF              reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     WRITE           reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
     pidentifier     reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
@@ -926,401 +818,502 @@ state 54
     ENDFOR          reduce using rule 10 (command -> identifier ASSIGNMENT expression SEMICOLON .)
 
 
+state 49
+
+    (22) expression -> value ADD . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 68
+    identifier                     shift and go to state 30
+
+state 50
+
+    (23) expression -> value SUB . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 69
+    identifier                     shift and go to state 30
+
+state 51
+
+    (24) expression -> value MUL . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 70
+    identifier                     shift and go to state 30
+
+state 52
+
+    (25) expression -> value DIV . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 71
+    identifier                     shift and go to state 30
+
+state 53
+
+    (26) expression -> value MOD . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 72
+    identifier                     shift and go to state 30
+
+state 54
+
+    (11) command -> REPEAT commands UNTIL condition . SEMICOLON
+
+    SEMICOLON       shift and go to state 73
+
+
 state 55
 
-    (21) expression -> value ADD . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (12) command -> FOR pidentifier FROM value . TO value DO commands ENDFOR
+    (13) command -> FOR pidentifier FROM value . DOWNTO value DO commands ENDFOR
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    TO              shift and go to state 74
+    DOWNTO          shift and go to state 75
 
-    value                          shift and go to state 74
-    identifier                     shift and go to state 26
 
 state 56
 
-    (22) expression -> value SUB . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (36) identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    ASSIGNMENT      reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    SEMICOLON       reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    ADD             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    SUB             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    MUL             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    DIV             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    MOD             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    EQUALS          reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    NOT_EQUALS      reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    LOWER           reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    GREATER         reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    LEQ             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    GEQ             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    TO              reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    DOWNTO          reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    DO              reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
+    THEN            reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
 
-    value                          shift and go to state 75
-    identifier                     shift and go to state 26
 
 state 57
 
-    (23) expression -> value MUL . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (37) identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    ASSIGNMENT      reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    SEMICOLON       reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    ADD             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    SUB             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    MUL             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    DIV             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    MOD             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    EQUALS          reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    NOT_EQUALS      reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    LOWER           reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    GREATER         reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    LEQ             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    GEQ             reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    TO              reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    DOWNTO          reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    DO              reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
+    THEN            reduce using rule 37 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
 
-    value                          shift and go to state 76
-    identifier                     shift and go to state 26
 
 state 58
 
-    (24) expression -> value DIV . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
-
-    value                          shift and go to state 77
-    identifier                     shift and go to state 26
-
-state 59
-
-    (25) expression -> value MOD . value
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
-
-    value                          shift and go to state 78
-    identifier                     shift and go to state 26
-
-state 60
-
-    (11) command -> WHILE condition DO commands . ENDWHILE
-    (7) commands -> commands . command
-    (9) command -> . READ identifier SEMICOLON
-    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    ENDWHILE        shift and go to state 79
-    READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
-    IF              shift and go to state 14
-    WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
-
-    command                        shift and go to state 20
-    identifier                     shift and go to state 9
-
-state 61
-
-    (26) condition -> value EQUALS value .
-
-    DO              reduce using rule 26 (condition -> value EQUALS value .)
-    THEN            reduce using rule 26 (condition -> value EQUALS value .)
-    SEMICOLON       reduce using rule 26 (condition -> value EQUALS value .)
-
-
-state 62
-
-    (27) condition -> value NOT_EQUALS value .
-
-    DO              reduce using rule 27 (condition -> value NOT_EQUALS value .)
-    THEN            reduce using rule 27 (condition -> value NOT_EQUALS value .)
-    SEMICOLON       reduce using rule 27 (condition -> value NOT_EQUALS value .)
-
-
-state 63
-
-    (28) condition -> value LOWER value .
-
-    DO              reduce using rule 28 (condition -> value LOWER value .)
-    THEN            reduce using rule 28 (condition -> value LOWER value .)
-    SEMICOLON       reduce using rule 28 (condition -> value LOWER value .)
-
-
-state 64
-
-    (29) condition -> value GREATER value .
-
-    DO              reduce using rule 29 (condition -> value GREATER value .)
-    THEN            reduce using rule 29 (condition -> value GREATER value .)
-    SEMICOLON       reduce using rule 29 (condition -> value GREATER value .)
-
-
-state 65
-
-    (30) condition -> value LEQ value .
-
-    DO              reduce using rule 30 (condition -> value LEQ value .)
-    THEN            reduce using rule 30 (condition -> value LEQ value .)
-    SEMICOLON       reduce using rule 30 (condition -> value LEQ value .)
-
-
-state 66
-
-    (31) condition -> value GEQ value .
-
-    DO              reduce using rule 31 (condition -> value GEQ value .)
-    THEN            reduce using rule 31 (condition -> value GEQ value .)
-    SEMICOLON       reduce using rule 31 (condition -> value GEQ value .)
-
-
-state 67
-
-    (12) command -> REPEAT commands UNTIL condition . SEMICOLON
-
-    SEMICOLON       shift and go to state 80
-
-
-state 68
-
-    (13) command -> FOR pidentifier FROM value . TO value DO commands ENDFOR
-    (14) command -> FOR pidentifier FROM value . DOWNTO value DO commands ENDFOR
-
-    TO              shift and go to state 81
-    DOWNTO          shift and go to state 82
-
-
-state 69
-
-    (35) identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .
-
-    ASSIGNMENT      reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    SEMICOLON       reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    EQUALS          reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    NOT_EQUALS      reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    LOWER           reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    GREATER         reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    LEQ             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    GEQ             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    ADD             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    SUB             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    MUL             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    DIV             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    MOD             reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    DO              reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    THEN            reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    TO              reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-    DOWNTO          reduce using rule 35 (identifier -> pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET .)
-
-
-state 70
-
-    (36) identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .
-
-    ASSIGNMENT      reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    SEMICOLON       reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    EQUALS          reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    NOT_EQUALS      reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    LOWER           reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    GREATER         reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    LEQ             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    GEQ             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    ADD             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    SUB             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    MUL             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    DIV             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    MOD             reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    DO              reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    THEN            reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    TO              reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-    DOWNTO          reduce using rule 36 (identifier -> pidentifier LEFT_BRACKET NUM RIGHT_BRACKET .)
-
-
-state 71
-
-    (15) command -> IF if_occured condition THEN . commands ELSE else_occured commands ENDIF
-    (17) command -> IF if_occured condition THEN . commands ENDIF
+    (14) command -> WHILE while_occured condition DO . commands ENDWHILE
     (7) commands -> . commands command
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
+
+    commands                       shift and go to state 76
+    command                        shift and go to state 7
+    identifier                     shift and go to state 9
+
+state 59
+
+    (27) condition -> value EQUALS . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 77
+    identifier                     shift and go to state 30
+
+state 60
+
+    (28) condition -> value NOT_EQUALS . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 78
+    identifier                     shift and go to state 30
+
+state 61
+
+    (29) condition -> value LOWER . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 79
+    identifier                     shift and go to state 30
+
+state 62
+
+    (30) condition -> value GREATER . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 80
+    identifier                     shift and go to state 30
+
+state 63
+
+    (31) condition -> value LEQ . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 81
+    identifier                     shift and go to state 30
+
+state 64
+
+    (32) condition -> value GEQ . value
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
+
+    value                          shift and go to state 82
+    identifier                     shift and go to state 30
+
+state 65
+
+    (16) command -> IF if_occured condition THEN . commands ELSE else_occured commands ENDIF
+    (18) command -> IF if_occured condition THEN . commands ENDIF
+    (7) commands -> . commands command
+    (8) commands -> . command
+    (9) command -> . READ identifier SEMICOLON
+    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    READ            shift and go to state 8
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
+    IF              shift and go to state 14
+    WRITE           shift and go to state 15
+    pidentifier     shift and go to state 12
 
     commands                       shift and go to state 83
     command                        shift and go to state 7
     identifier                     shift and go to state 9
 
-state 72
+state 66
 
     (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM . COLON NUM RIGHT_BRACKET
 
     COLON           shift and go to state 84
 
 
-state 73
+state 67
 
     (6) declarations -> pidentifier LEFT_BRACKET NUM COLON NUM . RIGHT_BRACKET
 
     RIGHT_BRACKET   shift and go to state 85
 
 
+state 68
+
+    (22) expression -> value ADD value .
+
+    SEMICOLON       reduce using rule 22 (expression -> value ADD value .)
+
+
+state 69
+
+    (23) expression -> value SUB value .
+
+    SEMICOLON       reduce using rule 23 (expression -> value SUB value .)
+
+
+state 70
+
+    (24) expression -> value MUL value .
+
+    SEMICOLON       reduce using rule 24 (expression -> value MUL value .)
+
+
+state 71
+
+    (25) expression -> value DIV value .
+
+    SEMICOLON       reduce using rule 25 (expression -> value DIV value .)
+
+
+state 72
+
+    (26) expression -> value MOD value .
+
+    SEMICOLON       reduce using rule 26 (expression -> value MOD value .)
+
+
+state 73
+
+    (11) command -> REPEAT commands UNTIL condition SEMICOLON .
+
+    END             reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    READ            reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    REPEAT          reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    FOR             reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    WHILE           reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    IF              reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    WRITE           reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    pidentifier     reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    UNTIL           reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDWHILE        reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ELSE            reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDIF           reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    ENDFOR          reduce using rule 11 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+
+
 state 74
 
-    (21) expression -> value ADD value .
+    (12) command -> FOR pidentifier FROM value TO . value DO commands ENDFOR
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    SEMICOLON       reduce using rule 21 (expression -> value ADD value .)
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
+    value                          shift and go to state 86
+    identifier                     shift and go to state 30
 
 state 75
 
-    (22) expression -> value SUB value .
+    (13) command -> FOR pidentifier FROM value DOWNTO . value DO commands ENDFOR
+    (33) value -> . NUM
+    (34) value -> . identifier
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    SEMICOLON       reduce using rule 22 (expression -> value SUB value .)
+    NUM             shift and go to state 29
+    pidentifier     shift and go to state 12
 
+    value                          shift and go to state 87
+    identifier                     shift and go to state 30
 
 state 76
 
-    (23) expression -> value MUL value .
+    (14) command -> WHILE while_occured condition DO commands . ENDWHILE
+    (7) commands -> commands . command
+    (9) command -> . READ identifier SEMICOLON
+    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    SEMICOLON       reduce using rule 23 (expression -> value MUL value .)
+    ENDWHILE        shift and go to state 88
+    READ            shift and go to state 8
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
+    IF              shift and go to state 14
+    WRITE           shift and go to state 15
+    pidentifier     shift and go to state 12
 
+    command                        shift and go to state 20
+    identifier                     shift and go to state 9
 
 state 77
 
-    (24) expression -> value DIV value .
+    (27) condition -> value EQUALS value .
 
-    SEMICOLON       reduce using rule 24 (expression -> value DIV value .)
+    DO              reduce using rule 27 (condition -> value EQUALS value .)
+    THEN            reduce using rule 27 (condition -> value EQUALS value .)
+    SEMICOLON       reduce using rule 27 (condition -> value EQUALS value .)
 
 
 state 78
 
-    (25) expression -> value MOD value .
+    (28) condition -> value NOT_EQUALS value .
 
-    SEMICOLON       reduce using rule 25 (expression -> value MOD value .)
+    DO              reduce using rule 28 (condition -> value NOT_EQUALS value .)
+    THEN            reduce using rule 28 (condition -> value NOT_EQUALS value .)
+    SEMICOLON       reduce using rule 28 (condition -> value NOT_EQUALS value .)
 
 
 state 79
 
-    (11) command -> WHILE condition DO commands ENDWHILE .
+    (29) condition -> value LOWER value .
 
-    END             reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    READ            reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    WHILE           reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    REPEAT          reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    FOR             reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    IF              reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    WRITE           reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    pidentifier     reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    UNTIL           reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    ENDWHILE        reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    ELSE            reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    ENDIF           reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
-    ENDFOR          reduce using rule 11 (command -> WHILE condition DO commands ENDWHILE .)
+    DO              reduce using rule 29 (condition -> value LOWER value .)
+    THEN            reduce using rule 29 (condition -> value LOWER value .)
+    SEMICOLON       reduce using rule 29 (condition -> value LOWER value .)
 
 
 state 80
 
-    (12) command -> REPEAT commands UNTIL condition SEMICOLON .
+    (30) condition -> value GREATER value .
 
-    END             reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    READ            reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    WHILE           reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    REPEAT          reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    FOR             reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    IF              reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    WRITE           reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    pidentifier     reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    UNTIL           reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    ENDWHILE        reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    ELSE            reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    ENDIF           reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
-    ENDFOR          reduce using rule 12 (command -> REPEAT commands UNTIL condition SEMICOLON .)
+    DO              reduce using rule 30 (condition -> value GREATER value .)
+    THEN            reduce using rule 30 (condition -> value GREATER value .)
+    SEMICOLON       reduce using rule 30 (condition -> value GREATER value .)
 
 
 state 81
 
-    (13) command -> FOR pidentifier FROM value TO . value DO commands ENDFOR
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (31) condition -> value LEQ value .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    DO              reduce using rule 31 (condition -> value LEQ value .)
+    THEN            reduce using rule 31 (condition -> value LEQ value .)
+    SEMICOLON       reduce using rule 31 (condition -> value LEQ value .)
 
-    value                          shift and go to state 86
-    identifier                     shift and go to state 26
 
 state 82
 
-    (14) command -> FOR pidentifier FROM value DOWNTO . value DO commands ENDFOR
-    (32) value -> . NUM
-    (33) value -> . identifier
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (32) condition -> value GEQ value .
 
-    NUM             shift and go to state 25
-    pidentifier     shift and go to state 13
+    DO              reduce using rule 32 (condition -> value GEQ value .)
+    THEN            reduce using rule 32 (condition -> value GEQ value .)
+    SEMICOLON       reduce using rule 32 (condition -> value GEQ value .)
 
-    value                          shift and go to state 87
-    identifier                     shift and go to state 26
 
 state 83
 
-    (15) command -> IF if_occured condition THEN commands . ELSE else_occured commands ENDIF
-    (17) command -> IF if_occured condition THEN commands . ENDIF
+    (16) command -> IF if_occured condition THEN commands . ELSE else_occured commands ENDIF
+    (18) command -> IF if_occured condition THEN commands . ENDIF
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    ELSE            shift and go to state 88
-    ENDIF           shift and go to state 89
+    ELSE            shift and go to state 89
+    ENDIF           shift and go to state 90
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
@@ -1329,7 +1322,7 @@ state 84
 
     (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON . NUM RIGHT_BRACKET
 
-    NUM             shift and go to state 90
+    NUM             shift and go to state 91
 
 
 state 85
@@ -1342,114 +1335,103 @@ state 85
 
 state 86
 
-    (13) command -> FOR pidentifier FROM value TO value . DO commands ENDFOR
-
-    DO              shift and go to state 91
-
-
-state 87
-
-    (14) command -> FOR pidentifier FROM value DOWNTO value . DO commands ENDFOR
+    (12) command -> FOR pidentifier FROM value TO value . DO commands ENDFOR
 
     DO              shift and go to state 92
 
 
+state 87
+
+    (13) command -> FOR pidentifier FROM value DOWNTO value . DO commands ENDFOR
+
+    DO              shift and go to state 93
+
+
 state 88
 
-    (15) command -> IF if_occured condition THEN commands ELSE . else_occured commands ENDIF
-    (16) else_occured -> .
+    (14) command -> WHILE while_occured condition DO commands ENDWHILE .
 
-    READ            reduce using rule 16 (else_occured -> .)
-    WHILE           reduce using rule 16 (else_occured -> .)
-    REPEAT          reduce using rule 16 (else_occured -> .)
-    FOR             reduce using rule 16 (else_occured -> .)
-    IF              reduce using rule 16 (else_occured -> .)
-    WRITE           reduce using rule 16 (else_occured -> .)
-    pidentifier     reduce using rule 16 (else_occured -> .)
+    END             reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    READ            reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    REPEAT          reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    FOR             reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    WHILE           reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    IF              reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    WRITE           reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    pidentifier     reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    UNTIL           reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    ENDWHILE        reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    ELSE            reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    ENDIF           reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
+    ENDFOR          reduce using rule 14 (command -> WHILE while_occured condition DO commands ENDWHILE .)
 
-    else_occured                   shift and go to state 93
 
 state 89
 
-    (17) command -> IF if_occured condition THEN commands ENDIF .
+    (16) command -> IF if_occured condition THEN commands ELSE . else_occured commands ENDIF
+    (17) else_occured -> .
 
-    END             reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    READ            reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    WHILE           reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    REPEAT          reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    FOR             reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    IF              reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    WRITE           reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    pidentifier     reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    UNTIL           reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    ENDWHILE        reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    ELSE            reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    ENDIF           reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
-    ENDFOR          reduce using rule 17 (command -> IF if_occured condition THEN commands ENDIF .)
+    READ            reduce using rule 17 (else_occured -> .)
+    REPEAT          reduce using rule 17 (else_occured -> .)
+    FOR             reduce using rule 17 (else_occured -> .)
+    WHILE           reduce using rule 17 (else_occured -> .)
+    IF              reduce using rule 17 (else_occured -> .)
+    WRITE           reduce using rule 17 (else_occured -> .)
+    pidentifier     reduce using rule 17 (else_occured -> .)
 
+    else_occured                   shift and go to state 94
 
 state 90
 
-    (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM . RIGHT_BRACKET
+    (18) command -> IF if_occured condition THEN commands ENDIF .
 
-    RIGHT_BRACKET   shift and go to state 94
+    END             reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    READ            reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    REPEAT          reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    FOR             reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    WHILE           reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    IF              reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    WRITE           reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    pidentifier     reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    UNTIL           reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    ENDWHILE        reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    ELSE            reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    ENDIF           reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
+    ENDFOR          reduce using rule 18 (command -> IF if_occured condition THEN commands ENDIF .)
 
 
 state 91
 
-    (13) command -> FOR pidentifier FROM value TO value DO . commands ENDFOR
-    (7) commands -> . commands command
-    (8) commands -> . command
-    (9) command -> . READ identifier SEMICOLON
-    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM . RIGHT_BRACKET
 
-    READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
-    IF              shift and go to state 14
-    WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    RIGHT_BRACKET   shift and go to state 95
 
-    commands                       shift and go to state 95
-    command                        shift and go to state 7
-    identifier                     shift and go to state 9
 
 state 92
 
-    (14) command -> FOR pidentifier FROM value DOWNTO value DO . commands ENDFOR
+    (12) command -> FOR pidentifier FROM value TO value DO . commands ENDFOR
     (7) commands -> . commands command
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     commands                       shift and go to state 96
     command                        shift and go to state 7
@@ -1457,29 +1439,29 @@ state 92
 
 state 93
 
-    (15) command -> IF if_occured condition THEN commands ELSE else_occured . commands ENDIF
+    (13) command -> FOR pidentifier FROM value DOWNTO value DO . commands ENDFOR
     (7) commands -> . commands command
     (8) commands -> . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     commands                       shift and go to state 97
     command                        shift and go to state 7
@@ -1487,152 +1469,182 @@ state 93
 
 state 94
 
+    (16) command -> IF if_occured condition THEN commands ELSE else_occured . commands ENDIF
+    (7) commands -> . commands command
+    (8) commands -> . command
+    (9) command -> . READ identifier SEMICOLON
+    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+
+    READ            shift and go to state 8
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
+    IF              shift and go to state 14
+    WRITE           shift and go to state 15
+    pidentifier     shift and go to state 12
+
+    commands                       shift and go to state 98
+    command                        shift and go to state 7
+    identifier                     shift and go to state 9
+
+state 95
+
     (4) declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET .
 
     BEGIN           reduce using rule 4 (declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET .)
     COMMA           reduce using rule 4 (declarations -> declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET .)
 
 
-state 95
-
-    (13) command -> FOR pidentifier FROM value TO value DO commands . ENDFOR
-    (7) commands -> commands . command
-    (9) command -> . READ identifier SEMICOLON
-    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
-
-    ENDFOR          shift and go to state 98
-    READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
-    IF              shift and go to state 14
-    WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
-
-    command                        shift and go to state 20
-    identifier                     shift and go to state 9
-
 state 96
 
-    (14) command -> FOR pidentifier FROM value DOWNTO value DO commands . ENDFOR
+    (12) command -> FOR pidentifier FROM value TO value DO commands . ENDFOR
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
     ENDFOR          shift and go to state 99
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
 
 state 97
 
-    (15) command -> IF if_occured condition THEN commands ELSE else_occured commands . ENDIF
+    (13) command -> FOR pidentifier FROM value DOWNTO value DO commands . ENDFOR
     (7) commands -> commands . command
     (9) command -> . READ identifier SEMICOLON
     (10) command -> . identifier ASSIGNMENT expression SEMICOLON
-    (11) command -> . WHILE condition DO commands ENDWHILE
-    (12) command -> . REPEAT commands UNTIL condition SEMICOLON
-    (13) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
-    (14) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
-    (15) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
-    (17) command -> . IF if_occured condition THEN commands ENDIF
-    (19) command -> . WRITE value SEMICOLON
-    (34) identifier -> . pidentifier
-    (35) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
-    (36) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    ENDIF           shift and go to state 100
+    ENDFOR          shift and go to state 100
     READ            shift and go to state 8
-    WHILE           shift and go to state 10
-    REPEAT          shift and go to state 11
-    FOR             shift and go to state 12
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
     IF              shift and go to state 14
     WRITE           shift and go to state 15
-    pidentifier     shift and go to state 13
+    pidentifier     shift and go to state 12
 
     command                        shift and go to state 20
     identifier                     shift and go to state 9
 
 state 98
 
-    (13) command -> FOR pidentifier FROM value TO value DO commands ENDFOR .
+    (16) command -> IF if_occured condition THEN commands ELSE else_occured commands . ENDIF
+    (7) commands -> commands . command
+    (9) command -> . READ identifier SEMICOLON
+    (10) command -> . identifier ASSIGNMENT expression SEMICOLON
+    (11) command -> . REPEAT commands UNTIL condition SEMICOLON
+    (12) command -> . FOR pidentifier FROM value TO value DO commands ENDFOR
+    (13) command -> . FOR pidentifier FROM value DOWNTO value DO commands ENDFOR
+    (14) command -> . WHILE while_occured condition DO commands ENDWHILE
+    (16) command -> . IF if_occured condition THEN commands ELSE else_occured commands ENDIF
+    (18) command -> . IF if_occured condition THEN commands ENDIF
+    (20) command -> . WRITE value SEMICOLON
+    (35) identifier -> . pidentifier
+    (36) identifier -> . pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET
+    (37) identifier -> . pidentifier LEFT_BRACKET NUM RIGHT_BRACKET
 
-    END             reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    READ            reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    WHILE           reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    REPEAT          reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    FOR             reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    IF              reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    WRITE           reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    pidentifier     reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    UNTIL           reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    ENDWHILE        reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    ELSE            reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    ENDIF           reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
-    ENDFOR          reduce using rule 13 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    ENDIF           shift and go to state 101
+    READ            shift and go to state 8
+    REPEAT          shift and go to state 10
+    FOR             shift and go to state 11
+    WHILE           shift and go to state 13
+    IF              shift and go to state 14
+    WRITE           shift and go to state 15
+    pidentifier     shift and go to state 12
 
+    command                        shift and go to state 20
+    identifier                     shift and go to state 9
 
 state 99
 
-    (14) command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .
+    (12) command -> FOR pidentifier FROM value TO value DO commands ENDFOR .
 
-    END             reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    READ            reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    WHILE           reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    REPEAT          reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    FOR             reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    IF              reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    WRITE           reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    pidentifier     reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    UNTIL           reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    ENDWHILE        reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    ELSE            reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    ENDIF           reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
-    ENDFOR          reduce using rule 14 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    END             reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    READ            reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    REPEAT          reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    FOR             reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    WHILE           reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    IF              reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    WRITE           reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    pidentifier     reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    UNTIL           reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    ENDWHILE        reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    ELSE            reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    ENDIF           reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
+    ENDFOR          reduce using rule 12 (command -> FOR pidentifier FROM value TO value DO commands ENDFOR .)
 
 
 state 100
 
-    (15) command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .
+    (13) command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .
 
-    END             reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    READ            reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    WHILE           reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    REPEAT          reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    FOR             reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    IF              reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    WRITE           reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    pidentifier     reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    UNTIL           reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    ENDWHILE        reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    ELSE            reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    ENDIF           reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
-    ENDFOR          reduce using rule 15 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    END             reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    READ            reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    REPEAT          reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    FOR             reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    WHILE           reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    IF              reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    WRITE           reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    pidentifier     reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    UNTIL           reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    ENDWHILE        reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    ELSE            reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    ENDIF           reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+    ENDFOR          reduce using rule 13 (command -> FOR pidentifier FROM value DOWNTO value DO commands ENDFOR .)
+
+
+state 101
+
+    (16) command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .
+
+    END             reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    READ            reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    REPEAT          reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    FOR             reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    WHILE           reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    IF              reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    WRITE           reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    pidentifier     reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    UNTIL           reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    ENDWHILE        reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    ELSE            reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    ENDIF           reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
+    ENDFOR          reduce using rule 16 (command -> IF if_occured condition THEN commands ELSE else_occured commands ENDIF .)
 

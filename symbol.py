@@ -45,13 +45,15 @@ class Symbol():
 
 
     def set_value(self, value):
-        self.value = value
+        if(self.value != -1):
+            self.value = value
 
     def set_address(self, address):
         self.address = address
     
     def set_tab_symbol_value_at_index(self, value, index):
-        self.values[index - self.tab_offset] = value
+        if(self.values[index - self.tab_offset] != -1):
+            self.values[index - self.tab_offset] = value
 
 
     def add_unknown_value_index(self, index):

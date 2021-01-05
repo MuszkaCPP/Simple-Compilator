@@ -524,10 +524,28 @@ def p_command_assignment(p):
         
 
 def p_command_all(p):
-    '''command : WHILE  condition  DO  commands  ENDWHILE
-               | REPEAT  commands  UNTIL  condition SEMICOLON
+    '''command : REPEAT  commands  UNTIL  condition SEMICOLON
                | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
                | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
+
+def p_command_while(p):
+    'command : WHILE while_occured condition  DO  commands  ENDWHILE'
+
+    global in_while_loop
+
+    if(machine_conditions.pop()):
+        code_generator.replace_jump_for_condition(_while=True)
+    
+    in_while_loop.pop()
+
+def p_command_while_occured(p):
+    'while_occured :'
+
+    global in_while_loop
+
+    in_while_loop.append(True)
+
+    code_generator.save_current_code_length()
 
 def p_command_if_else(p):
     'command : IF if_occured condition THEN commands ELSE else_occured commands ENDIF'
@@ -546,7 +564,6 @@ def p_command_if_else(p):
 def p_command_else_occured(p):
     'else_occured :'
     global if_passes, else_occured
-
 
     if(machine_conditions[-1]):
         code_generator.replace_jump_for_condition(pop=False)
@@ -625,7 +642,7 @@ def p_expression_math(p):
                   | value DIV value
                   | value MOD value'''
                   
-    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values
+    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, in_while_loop
     machine_math = False
     left_is_var = False
     right_is_var = False
@@ -643,7 +660,7 @@ def p_expression_math(p):
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
-        if(value == -1 or right_index == -1):
+        if(value == -1 or right_index == -1 or in_while_loop[-1]):
             machine_math = True
 
     if(symbol_exists(p[1])):
@@ -656,7 +673,7 @@ def p_expression_math(p):
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         
-        if(value == -1 or left_index == -1):
+        if(value == -1 or left_index == -1 or in_while_loop[-1]):
             machine_math = True
 
     if(is_tab(p[1])):
@@ -715,7 +732,7 @@ def p_condition(p):
                  | value LEQ value
                  | value GEQ value'''
 
-    global in_if_statement, if_passes, machine_conditions_manager, tab_indexes, machine_conditions
+    global in_if_statement, if_passes, machine_conditions_manager, tab_indexes, machine_conditions, in_while_loop
     left_is_var = False
     right_is_var = False
     machine_condition = False
@@ -735,7 +752,7 @@ def p_condition(p):
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
-        if(value == -1 or right_index == -1):
+        if(value == -1 or right_index == -1 or in_while_loop[-1]):
             machine_condition = True
 
     if(symbol_exists(p[1])):
@@ -748,7 +765,7 @@ def p_condition(p):
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         
-        if(value == -1 or left_index == -1):
+        if(value == -1 or left_index == -1 or in_while_loop[-1]):
             machine_condition = True
 
     if(is_tab(p[1])):
@@ -757,15 +774,27 @@ def p_condition(p):
         tab_indexes.append(right_index)  
 
     if(not machine_condition and (symbol_exists(p[1]) or symbol_exists(p[3]))):
-        if(is_tab(p[3])):
-            p[3] = get_symbol_by_name(p[3]).get_tab_symbol_value(tab_indexes.pop())
-        elif(symbol_exists(p[3])):
-            p[3] = get_symbol_by_name(p[3]).get_symbol_value()
+        if(in_while_loop[-1]):
+            if(is_tab(p[3])):
+                p[3] = get_symbol_by_name(p[3]).get_tab_index_address(tab_indexes.pop())
+            elif(symbol_exists(p[3])):
+                p[3] = get_symbol_by_name(p[3]).get_address()
 
-        if(is_tab(p[1])):
-            p[1] = get_symbol_by_name(p[1]).get_tab_symbol_value(tab_indexes.pop())
-        elif(symbol_exists(p[1])):
-            p[1] = get_symbol_by_name(p[1]).get_symbol_value()
+            if(is_tab(p[1])):
+                p[1] = get_symbol_by_name(p[1]).get_tab_index_address(tab_indexes.pop())
+            elif(symbol_exists(p[1])):
+                p[1] = get_symbol_by_name(p[1]).get_address()
+
+        else:
+            if(is_tab(p[3])):
+                p[3] = get_symbol_by_name(p[3]).get_tab_symbol_value(tab_indexes.pop())
+            elif(symbol_exists(p[3])):
+                p[3] = get_symbol_by_name(p[3]).get_symbol_value()
+
+            if(is_tab(p[1])):
+                p[1] = get_symbol_by_name(p[1]).get_tab_symbol_value(tab_indexes.pop())
+            elif(symbol_exists(p[1])):
+                p[1] = get_symbol_by_name(p[1]).get_symbol_value()
 
     if(machine_condition):
         machine_conditions.append(True)
@@ -775,49 +804,43 @@ def p_condition(p):
         machine_conditions.append(False)
 
     if p[2] == '=':
-        if(machine_condition):
-            condition = "="
-        else:
+        condition = "="
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] == p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '!=':
-        if(machine_condition):
-            condition = "!="
-        else:
+        condition = "!="
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] != p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '<':
-        if(machine_condition):
-            condition = "<"
-        else:
+        condition = "<"
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] < p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '>':
-        if(machine_condition):
-            condition = ">"
-        else:
+        condition = ">"
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] > p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '<=':
-        if(machine_condition):
-            condition = "<="
-        else:
+        condition = "<="
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] <= p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '>=':
-        if(machine_condition):
-            condition = ">="
-        else:
+        condition = ">="
+        if(not machine_condition and not in_while_loop[-1]):
             if(p[1] >= p[3]):
                 p[0] = True
             else:
@@ -833,10 +856,38 @@ def p_condition(p):
                 if_passes.append(False)
             else:
                 if_passes.append(True)
-
         return
 
-    if(machine_condition):
+    if(not machine_condition and in_while_loop[-1]):
+        if(left_is_var):
+            if(right_is_var):
+                machine_conditions_manager.carry_out_condition(
+                    condition=condition,
+                    address_a=p[1],
+                    address_b=p[3]
+                )
+            else:
+                machine_conditions_manager.carry_out_condition(
+                    condition=condition,
+                    address_a=p[1],
+                    val_b=p[3]
+                )
+        else:
+            if(right_is_var):
+                machine_conditions_manager.carry_out_condition(
+                    condition=condition,
+                    val_a=p[1],
+                    address_b=p[3]
+                )
+            else:
+                machine_conditions_manager.carry_out_condition(
+                    condition=condition,
+                    val_a=p[1],
+                    val_b=p[3]
+                )
+        machine_conditions[-1]=True
+        
+    elif(machine_condition):
         if(left_is_var):
             left_symbol = get_symbol_by_name(machine_condition_values[0])
             left_symbol_address = left_symbol.get_address()
@@ -1019,6 +1070,8 @@ in_if_statement = False
 if_passes = []
 else_occured = False
 machine_conditions = []
+
+in_while_loop = []
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

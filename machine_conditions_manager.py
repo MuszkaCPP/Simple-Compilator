@@ -120,3 +120,16 @@ class MachineConditionsManager():
                     val_a=val_a,
                     address_b=address_b
                 )
+        elif(val_a != -1 and val_b != -1):
+            if(condition=="=" or condition=="!="):
+                self.code_generator.check_condition(
+                    condition=condition,
+                    val_a=val_b,
+                    val_b=val_a
+                )
+            else:
+                self.code_generator.check_condition(
+                    condition=condition,
+                    val_a=val_a,
+                    val_b=val_b
+                )

@@ -644,6 +644,10 @@ class CodeGenerator():
                 self.append_code("LOAD a f\n")
                 self.generate_number_at_reg(val_b, 'b')
         
+        if(val_a != -1 and val_b != -1):
+            self.generate_number_at_reg(val_a, 'a')
+            self.generate_number_at_reg(val_b, 'b')
+        
         if(condition=="="):
             self.check_registers_equality('a', 'b')
         elif(condition=="!="):
@@ -657,7 +661,7 @@ class CodeGenerator():
         elif(condition==">="):
             self.check_registers_lower_equals('b', 'a')
     
-    def replace_jump_for_condition(self, pop=True):
+    def replace_jump_for_condition(self, pop=True, _while=False):
         length_before_jump = 0
         current_code_length = len(self.generated_code)
 
@@ -672,10 +676,17 @@ class CodeGenerator():
 
         jump_value = code_length_increase + 1
 
-        if(not pop):
+        if(not pop or _while):
             jump_value += 1
 
+        if(_while):
+            backwards_jump = current_code_length - self.length_before_jump.pop()
+            self.generated_code.append("JUMP -" + str(backwards_jump) + "\n")
+
         self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
+
+    def save_current_code_length(self):
+        self.length_before_jump.append(len(self.generated_code))
 
     def check_registers_equality(self, reg_1, reg_2):
         self.append_code("INC " + str(reg_1) + "\n")
