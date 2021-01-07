@@ -508,13 +508,14 @@ class CodeGenerator():
                     self.append_code("LOAD a f\n")
                     self.generate_number_at_reg(val_b, 'b')
 
-        self.append_code("RESET f\n")
         self.carry_out_modulo_algorithm('a','b','c','d','e')    
 
     def carry_out_modulo_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
         self.append_code("RESET e\n")
         self.append_code("RESET f\n")
         
+        self.append_code("ADD e " + str(reg_1) + "\n")
+        self.append_code("ADD f " + str(reg_2) + "\n")
         self.append_code("INC e\n")
         self.append_code("SUB e f\n")
         self.append_code("JZERO e 3\n") #--> if b>a JUMP
@@ -890,6 +891,20 @@ class CodeGenerator():
         self.append_code("LOAD f d\n")
         self.append_code("ADD c f\n")
         self.append_code("STORE e c\n")
+
+    def store_unknown_index_at_known_address(self, known_address, tab_address, index_address):
+        self.append_code("RESET a\n")
+        self.append_code("RESET b\n")
+        self.append_code("RESET c\n")
+        self.append_code("RESET d\n")
+        self.generate_number_at_reg(known_address, 'a')
+        self.generate_number_at_reg(tab_address, 'b')
+        self.generate_number_at_reg(index_address, 'd')
+        self.append_code("LOAD c d\n")
+        self.append_code("ADD b c\n")
+        self.append_code("RESET d\n")
+        self.append_code("LOAD d b\n")
+        self.append_code("STORE b a\n")
 
     def store_from_reg_to_unknown_index(self, reg, tab_address, index_address):
         #Value in reg e!

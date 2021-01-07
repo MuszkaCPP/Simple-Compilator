@@ -40,7 +40,7 @@ class Symbol():
         return self.value
 
     def get_tab_symbol_value(self, index):
-        return self.values[index - self.tab_offset]
+        return self.values.get(index - self.tab_offset)
 
 
     def set_value(self, value):

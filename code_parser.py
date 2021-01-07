@@ -420,6 +420,24 @@ def p_command_assignment(p):
                                         symbol.get_address(),
                                         left_index_address
                         )
+                    elif(right_index == -1):
+                        right_index_address = get_symbol_address(last_read_symbols.pop())
+
+                        code_generator.store_unknown_index_at_known_address(
+                            known_address=symbol.get_tab_index_address(left_index),
+                            tab_address=symbol_asgn.get_address(),
+                            index_address=right_index_address
+                        )
+                        
+                    elif(left_index == -1):
+                        left_index_address = get_symbol_address(last_read_symbols.pop())
+
+                        code_generator.store_unknown_value_by_unknown_index(
+                            address_a=symbol_asgn.get_tab_index_address(right_index),
+                            tab_address=symbol.get_address(),
+                            index_address=left_index_address
+                        )
+                        
                     elif(value == -1):
                         code_generator.store_from_address_to_address(
                                     symbol_asgn.get_tab_index_address(right_index),
@@ -685,27 +703,31 @@ def p_expression_math(p):
 
     #Machine maths
     if(symbol_exists(p[3])):
+        right_symbol = get_symbol_by_name(p[3])
         right_is_var = True
         value = 0
-        if(is_tab(p[3])):
+
+        if(right_symbol.is_tab):
             right_index = tab_indexes.pop()
-            if(right_index != -1 and get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
+            if(right_index != -1 and right_symbol.get_tab_symbol_value(right_index)==-1):
                 machine_math = True
         else:
-            value = get_symbol_by_name(p[3]).get_symbol_value()
+            value = right_symbol.get_symbol_value()
         
         if(value == -1 or right_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_math = True
 
     if(symbol_exists(p[1])):
         left_is_var = True
+        left_symbol = get_symbol_by_name(p[1])
         value = 0
-        if(is_tab(p[1])):
+
+        if(left_symbol.is_tab):
             left_index = tab_indexes.pop()
-            if(left_index != -1 and get_symbol_by_name(p[3]).get_tab_symbol_value(left_index)==-1):
+            if(left_index != -1 and left_symbol.get_tab_symbol_value(left_index)==-1):
                 machine_math = True
         else:
-            value = get_symbol_by_name(p[1]).get_symbol_value()
+            value = left_symbol.get_symbol_value()
         
         if(value == -1 or left_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_math = True
@@ -751,12 +773,18 @@ def p_expression_math(p):
         if(machine_math):
             p[0] = '/'
         else:
-            p[0] = p[1] // p[3]
+            if(p[3] == 0):
+                p[0] = 0
+            else:
+                p[0] = p[1] // p[3]
     elif p[2] == '%':
         if(machine_math):
             p[0] = '%'
         else:
-            p[0] = p[1] % p[3]
+            if(p[3] == 0):
+                p[0] = 0
+            else:
+                p[0] = p[1] % p[3]
 
 def p_condition(p):
     '''condition : value EQUALS value
