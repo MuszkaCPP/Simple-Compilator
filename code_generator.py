@@ -371,6 +371,14 @@ class CodeGenerator():
 
     
     def carry_out_division_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
+        self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
+        self.append_code("ADD e " + str(reg_1) + "\n")
+        self.append_code("ADD f " + str(reg_2) + "\n")
+        self.append_code("INC e\n")
+        self.append_code("SUB e f\n")
+        self.append_code("JZERO e 32\n") #--> if b>a JUMP
+
         self.append_code("RESET " + str(quotient) + "\n")
         self.append_code("RESET " + str(counter) + "\n")
         self.append_code("RESET " + str(reg_tmp) + "\n")
@@ -474,12 +482,12 @@ class CodeGenerator():
                 self.append_code("LOAD b f\n")
 
         elif(address_a != -1):
+            self.generate_number_at_reg(address_a, 'f')
+            self.append_code("LOAD a f\n")
+            self.append_code("RESET f\n")
+
             #variable % tab(a)
             if(right_index_address != -1):
-                self.generate_number_at_reg(address_a, 'f')
-                self.append_code("LOAD a f\n")
-                self.append_code("RESET f\n")
-
                 self.generate_number_at_reg(address_b, 'f')
                 self.generate_number_at_reg(right_index_address, 'c')
 
@@ -489,9 +497,6 @@ class CodeGenerator():
 
             #variable % variable
             elif(address_b != -1):
-                self.generate_number_at_reg(address_a, 'f')
-                self.append_code("LOAD a f\n")
-                self.append_code("RESET f\n")
                 self.generate_number_at_reg(address_b, 'f')
                 self.append_code("LOAD b f\n")
             #variable % number
@@ -503,9 +508,21 @@ class CodeGenerator():
                     self.append_code("LOAD a f\n")
                     self.generate_number_at_reg(val_b, 'b')
 
+        self.append_code("RESET f\n")
         self.carry_out_modulo_algorithm('a','b','c','d','e')    
 
     def carry_out_modulo_algorithm(self, reg_1, reg_2, quotient, counter, reg_tmp):
+        self.append_code("RESET e\n")
+        self.append_code("RESET f\n")
+        
+        self.append_code("INC e\n")
+        self.append_code("SUB e f\n")
+        self.append_code("JZERO e 3\n") #--> if b>a JUMP
+
+        self.append_code("DEC e\n")
+
+        self.append_code("JZERO e 40\n") #--> JUMP if True
+
         self.append_code("RESET " + str(quotient) + "\n")
         self.append_code("RESET " + str(counter) + "\n")
         self.append_code("RESET " + str(reg_tmp) + "\n")
@@ -661,7 +678,7 @@ class CodeGenerator():
         elif(condition==">="):
             self.check_registers_lower_equals('b', 'a')
     
-    def replace_jump_for_condition(self, pop=True, _while=False):
+    def replace_jump_for_condition(self, pop=True, _while=False, _repeat=False):
         length_before_jump = 0
         current_code_length = len(self.generated_code)
 
@@ -682,8 +699,12 @@ class CodeGenerator():
         if(_while):
             backwards_jump = current_code_length - self.length_before_jump.pop()
             self.generated_code.append("JUMP -" + str(backwards_jump) + "\n")
+        elif(_repeat):
+            backwards_jump = current_code_length - self.length_before_jump.pop() - 1
+            self.generated_code[length_before_jump-1] = "JUMP -" + str(backwards_jump) + "\n"
 
-        self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
+        if(not _repeat):
+            self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
 
     def save_current_code_length(self):
         self.length_before_jump.append(len(self.generated_code))
@@ -880,10 +901,9 @@ class CodeGenerator():
         self.generate_number_at_reg(index_address, 'b')
 
         self.append_code("LOAD c b\n")
-
         self.append_code("ADD a c\n")
 
-        self.append_code("STORE e a\n")
+        self.append_code("STORE " + str(reg) +" a\n")
 
 
     def get_generated_code(self):

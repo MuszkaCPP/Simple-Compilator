@@ -52,6 +52,10 @@ precedence = (
     ( 'left', 'MUL', 'DIV', 'MOD' ),
 )
 
+states = (
+    ('comment', 'exclusive'),
+)
+
 # Marks
 t_ASSIGNMENT = r'\:='
 t_COLON = r'[:]'
@@ -77,8 +81,19 @@ t_GEQ = r'>='
 
 #ignore
 t_ignore_RUBBISH = r'[ \t\n]+'
-t_ignore_COMMENT = r'\[.*\]'
 
+#Comment
+def t_comment(t):
+    r'\['
+    t.lexer.begin('comment')
+
+def t_comment_error(t):
+    t.lexer.skip(1)
+
+def t_comment_end(t):
+    r'\]'
+    t.lexer.begin('INITIAL')
+        
 #Number, pidentifier
 def t_NUM(t):
     r'[0-9]+'
@@ -180,14 +195,13 @@ def p_command_read(p):
         return
 
     symbol = get_symbol_by_name(p[2])
-
-    if(is_tab(p[2])):
+    if(symbol.is_tab):
         index = tab_indexes.pop()
         if(index==-1):
             #READ tab(a)
             code_generator.store_unknown_value_from_adress_to_address(
                 get_symbol_address(last_read_symbols.pop()),
-                get_symbol_address(p[2])
+                symbol.get_address()
             )
         else:
             code_generator.read_from_reg(get_symbol_by_name(p[2]).get_tab_index_address(index),'f')
@@ -523,10 +537,30 @@ def p_command_assignment(p):
             symbol.is_defined = True
         
 
-def p_command_all(p):
-    '''command : REPEAT  commands  UNTIL  condition SEMICOLON
-               | FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR
-               | FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'''
+def p_command_for_down_to(p):
+    'command : FOR  pidentifier  FROM  value  DOWNTO  value DO  commands  ENDFOR'
+
+def p_command_for_from_to(p):
+    'command : FOR  pidentifier  FROM  value TO  value DO  commands  ENDFOR'
+
+def p_command_repeat_until(p):
+    'command : REPEAT repeat_occured  commands  UNTIL  condition SEMICOLON'
+
+    global in_repeat_loop
+
+    if(machine_conditions.pop()):
+        code_generator.replace_jump_for_condition(_repeat=True)
+
+    in_repeat_loop.pop()
+
+def p_command_repeat_occured(p):
+    'repeat_occured :'
+
+    global in_repeat_loop
+
+    in_repeat_loop.append(True)
+
+    code_generator.save_current_code_length()
 
 def p_command_while(p):
     'command : WHILE while_occured condition  DO  commands  ENDWHILE'
@@ -642,7 +676,7 @@ def p_expression_math(p):
                   | value DIV value
                   | value MOD value'''
                   
-    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, in_while_loop
+    global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, in_while_loop, in_repeat_loop
     machine_math = False
     left_is_var = False
     right_is_var = False
@@ -655,12 +689,12 @@ def p_expression_math(p):
         value = 0
         if(is_tab(p[3])):
             right_index = tab_indexes.pop()
-            if(get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
+            if(right_index != -1 and get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
                 machine_math = True
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
-        if(value == -1 or right_index == -1 or in_while_loop[-1]):
+        if(value == -1 or right_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_math = True
 
     if(symbol_exists(p[1])):
@@ -668,12 +702,12 @@ def p_expression_math(p):
         value = 0
         if(is_tab(p[1])):
             left_index = tab_indexes.pop()
-            if(get_symbol_by_name(p[3]).get_tab_symbol_value(left_index)==-1):
+            if(left_index != -1 and get_symbol_by_name(p[3]).get_tab_symbol_value(left_index)==-1):
                 machine_math = True
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         
-        if(value == -1 or left_index == -1 or in_while_loop[-1]):
+        if(value == -1 or left_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_math = True
 
     if(is_tab(p[1])):
@@ -747,12 +781,12 @@ def p_condition(p):
         value = 0
         if(is_tab(p[3])):
             right_index = tab_indexes.pop()
-            if(get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
+            if(right_index != -1 and get_symbol_by_name(p[3]).get_tab_symbol_value(right_index)==-1):
                 machine_condition = True
         else:
             value = get_symbol_by_name(p[3]).get_symbol_value()
         
-        if(value == -1 or right_index == -1 or in_while_loop[-1]):
+        if(value == -1 or right_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_condition = True
 
     if(symbol_exists(p[1])):
@@ -760,12 +794,12 @@ def p_condition(p):
         value = 0
         if(is_tab(p[1])):
             left_index = tab_indexes.pop()
-            if(get_symbol_by_name(p[1]).get_tab_symbol_value(left_index)==-1):
+            if(left_index != -1 and get_symbol_by_name(p[1]).get_tab_symbol_value(left_index)==-1):
                 machine_condition = True
         else:
             value = get_symbol_by_name(p[1]).get_symbol_value()
         
-        if(value == -1 or left_index == -1 or in_while_loop[-1]):
+        if(value == -1 or left_index == -1 or in_while_loop[-1] or in_repeat_loop[-1]):
             machine_condition = True
 
     if(is_tab(p[1])):
@@ -774,7 +808,7 @@ def p_condition(p):
         tab_indexes.append(right_index)  
 
     if(not machine_condition and (symbol_exists(p[1]) or symbol_exists(p[3]))):
-        if(in_while_loop[-1]):
+        if(in_while_loop[-1] or in_repeat_loop[-1]):
             if(is_tab(p[3])):
                 p[3] = get_symbol_by_name(p[3]).get_tab_index_address(tab_indexes.pop())
             elif(symbol_exists(p[3])):
@@ -805,42 +839,60 @@ def p_condition(p):
 
     if p[2] == '=':
         condition = "="
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] == p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '!=':
         condition = "!="
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] != p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '<':
         condition = "<"
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] < p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '>':
         condition = ">"
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] > p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '<=':
         condition = "<="
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] <= p[3]):
                 p[0] = True
             else:
                 p[0] = False
     elif p[2] == '>=':
         condition = ">="
-        if(not machine_condition and not in_while_loop[-1]):
+        if(not machine_condition
+            and not in_while_loop[-1]
+            and not in_repeat_loop[-1]
+        ):
             if(p[1] >= p[3]):
                 p[0] = True
             else:
@@ -858,7 +910,7 @@ def p_condition(p):
                 if_passes.append(True)
         return
 
-    if(not machine_condition and in_while_loop[-1]):
+    if(not machine_condition and (in_while_loop[-1] or in_repeat_loop[-1])):
         if(left_is_var):
             if(right_is_var):
                 machine_conditions_manager.carry_out_condition(
@@ -1071,7 +1123,8 @@ if_passes = []
 else_occured = False
 machine_conditions = []
 
-in_while_loop = []
+in_while_loop = [False]
+in_repeat_loop = [False]
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

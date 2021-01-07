@@ -6,7 +6,7 @@ class Symbol():
         self.is_tab = is_tab
         self.is_defined = False
         self.value = 0
-        self.values = [0 for i in range(0,end_index - start_index + 1)]
+        self.values = {}
         
         if(is_tab):
             self.is_tab = True
@@ -14,7 +14,6 @@ class Symbol():
             self.end_address = self.start_address + (end_index - start_index)
             self.length = self.end_address - self.start_address + 1
             self.tab_offset = start_index
-            self.unknown_values = []
 
     def get_address(self):
         return self.address
@@ -52,15 +51,9 @@ class Symbol():
         self.address = address
     
     def set_tab_symbol_value_at_index(self, value, index):
-        if(self.values[index - self.tab_offset] != -1):
+        if(self.values.get(index - self.tab_offset) != -1):
             self.values[index - self.tab_offset] = value
 
-
-    def add_unknown_value_index(self, index):
-        self.unknown_values.append(index)
-    
-    def get_unknown_indexes(self):
-        return self.unknown_values
 
 
             
