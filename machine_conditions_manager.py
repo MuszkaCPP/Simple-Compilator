@@ -7,10 +7,12 @@ class MachineConditionsManager():
                             condition = "",
                             val_a=-1,
                             address_a=-1,
-                            left_index_address = -1,
+                            left_index_address=-1,
+                            left_offset=-1,
                             val_b=-1,
                             address_b=-1,
-                            right_index_address = -1
+                            right_index_address=-1,
+                            right_offset=-1
                             ):
 
         if(address_a != -1
@@ -23,8 +25,10 @@ class MachineConditionsManager():
                 condition=condition,
                 address_a=address_a,
                 left_index_address=left_index_address,
+                left_offset=left_offset,
                 address_b=address_b,
-                right_index_address=right_index_address
+                right_index_address=right_index_address,
+                right_offset=right_offset
             )
         #tab(a) ? variable
         elif(address_a != -1
@@ -36,6 +40,7 @@ class MachineConditionsManager():
                 condition=condition,
                 address_a=address_a,
                 left_index_address=left_index_address,
+                left_offset=left_offset,
                 address_b=address_b
             )
         #variable ? tab(a)
@@ -49,16 +54,16 @@ class MachineConditionsManager():
                     condition=condition,
                     address_b=address_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
-
+                    left_index_address=right_index_address,
+                    left_offset=right_offset
                 )
             else:
                 self.code_generator.check_condition(
                     condition=condition,
                     address_a=address_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
-
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
         #tab(a) ? value
         elif(address_a != -1 
@@ -70,6 +75,7 @@ class MachineConditionsManager():
                 condition=condition,
                 address_a=address_a,
                 left_index_address=left_index_address,
+                left_offset=left_offset,
                 val_b=val_b
             )
         #value ? tab(a)
@@ -83,14 +89,16 @@ class MachineConditionsManager():
                     condition=condition,
                     val_b=val_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
+                    left_index_address=right_index_address,
+                    left_offset=right_offset,
                 )
             else:
                 self.code_generator.check_condition(
                     condition=condition,
                     val_a=val_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset,
                 )
         #variable ? variable
         elif(address_a != -1 and address_b != -1):

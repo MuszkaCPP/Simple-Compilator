@@ -53,7 +53,7 @@ class MachineMathManager():
                     address_b=address_a,
                     address_a=address_b,
                     left_index_address=right_index_address,
-                    right_offset=right_offset
+                    left_offset=right_offset
 
                 )
             #tab(a) + value
@@ -78,7 +78,7 @@ class MachineMathManager():
                     val_b=val_a,
                     address_a=address_b,
                     left_index_address=right_index_address,
-                    right_offset=right_offset
+                    left_offset=right_offset
                 )
             #variable + variable
             elif(address_a != -1 and address_b != -1):
@@ -202,7 +202,7 @@ class MachineMathManager():
                     address_b=address_a,
                     address_a=address_b,
                     left_index_address=right_index_address,
-                    right_offset=right_offset
+                    left_offset=right_offset
                 )
             #tab(a) * value
             elif(address_a != -1 
@@ -226,7 +226,7 @@ class MachineMathManager():
                     val_b=val_a,
                     address_a=address_b,
                     left_index_address=right_index_address,
-                    right_offset=right_offset
+                    left_offset=right_offset
                 )
             #variable * variable
             elif(address_a != -1 and address_b != -1):

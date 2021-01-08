@@ -246,21 +246,23 @@ def p_command_assignment(p):
                         if(right_index == -1):
                             right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
                         else:
-                            right_index_address = 0
+                            right_index_address = -1
                             right_symbol_address = right_symbol.get_real_tab_index_address(right_index)
 
                         if(left_index == -1):
                             left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
                         else:
-                            left_index_address = 0
+                            left_index_address = -1
                             left_symbol_address = left_symbol.get_real_tab_index_address(left_index)
 
                         machine_math_manager.carry_out_operation(
                             operation = p[3],
                             address_a=left_symbol_address,
                             left_index_address=left_index_address,
+                            left_offset=left_symbol.get_tab_offset(),
                             address_b=right_symbol_address,
-                            right_index_address= right_index_address
+                            right_index_address= right_index_address,
+                            right_offset=right_symbol.get_tab_offset()
                         )
                     #tab(a) + variable
                     else:
@@ -275,6 +277,7 @@ def p_command_assignment(p):
                             operation=p[3],
                             address_a=left_symbol_address,
                             left_index_address=left_index_address,
+                            left_offset=left_symbol.get_tab_offset(),
                             address_b=right_symbol_address
                         )
 
@@ -293,6 +296,7 @@ def p_command_assignment(p):
                         operation=p[3],
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
+                        left_offset=left_symbol.get_tab_offset(),
                         val_b=right_value
                     )
             else:
@@ -314,7 +318,8 @@ def p_command_assignment(p):
                             operation=p[3],
                             address_a=left_symbol_address,
                             address_b=right_symbol_address,
-                            right_index_address=right_index_address
+                            right_index_address=right_index_address,
+                            right_offset=right_symbol.get_tab_offset()
                         )
                     #variable + variable
                     else:
@@ -352,6 +357,7 @@ def p_command_assignment(p):
                         val_a=left_value,
                         address_b=right_symbol_address,
                         right_index_address=right_index_address,
+                        right_offset=right_symbol.get_tab_offset()
                     )
                 #number + variable
                 else:
@@ -417,10 +423,12 @@ def p_command_assignment(p):
                         left_index_address = get_symbol_address(last_read_symbols.pop())
 
                         code_generator.store_unknown_tab_with_unknown_indexes(
-                                        symbol_asgn.get_address(),
-                                        right_index_address,
-                                        symbol.get_address(),
-                                        left_index_address
+                                        right_tab_address=symbol_asgn.get_address(),
+                                        right_index_address=right_index_address,
+                                        right_tab_offset=symbol_asgn.get_tab_offset(),
+                                        left_tab_address=symbol.get_address(),
+                                        left_index_address=left_index_address,
+                                        left_tab_offset=symbol.get_tab_offset()
                         )
                     elif(right_index == -1):
                         right_index_address = get_symbol_address(last_read_symbols.pop())
@@ -428,7 +436,8 @@ def p_command_assignment(p):
                         code_generator.store_unknown_index_at_known_address(
                             known_address=symbol.get_real_tab_index_address(left_index),
                             tab_address=symbol_asgn.get_address(),
-                            index_address=right_index_address
+                            index_address=right_index_address,
+                            tab_offset=symbol_asgn.get_tab_offset()
                         )
                         
                     elif(left_index == -1):
@@ -437,7 +446,8 @@ def p_command_assignment(p):
                         code_generator.store_unknown_value_by_unknown_index(
                             address_a=symbol_asgn.get_real_tab_index_address(right_index),
                             tab_address=symbol.get_address(),
-                            index_address=left_index_address
+                            index_address=left_index_address,
+                            tab_offset=symbol.get_tab_offset()
                         )
                         
                     elif(value == -1):
@@ -463,9 +473,10 @@ def p_command_assignment(p):
                             index_address = get_symbol_address(last_read_symbols.pop())
 
                             code_generator.store_unknown_value_by_unknown_index(
-                                            symbol_asgn.get_address(),
-                                            symbol.get_address(),
-                                            index_address
+                                            address_a=symbol_asgn.get_address(),
+                                            tab_address=symbol.get_address(),
+                                            index_address=index_address,
+                                            tab_offset=symbol.get_tab_offset()
                             )
                             #symbol.set_tab_symbol_value_at_index(-1, index_address) -> prawdopodobnie useless
                         else:
@@ -488,9 +499,10 @@ def p_command_assignment(p):
                 if(index == -1):
                     index_address = get_symbol_address(last_read_symbols.pop())
                     code_generator.store_value_at_unknown_index(
-                                    value,
-                                    symbol.get_address(),
-                                    index_address
+                                    val_a=value,
+                                    tab_address=symbol.get_address(),
+                                    index_address=index_address,
+                                    tab_offset=symbol.get_tab_offset()
                     )
                     #symbol.set_tab_symbol_value_at_index(value, index_address)
                 else:
@@ -570,7 +582,7 @@ def p_command_for_from_to(p):
     in_for_loop.pop()
 
 
-def p_cpmmand_do_occured(p):
+def p_command_do_occured(p):
     'do_occured :'
 
     global last_read_symbols, tab_indexes
@@ -591,6 +603,7 @@ def p_cpmmand_do_occured(p):
         left_symbol_address = left_symbol.get_address()
 
         if(left_symbol.is_tab):
+            left_offset = -1
             if(right_is_var):
                 
                 right_symbol_address = right_symbol.get_address()
@@ -599,25 +612,31 @@ def p_cpmmand_do_occured(p):
                     right_index = tab_indexes.pop()
                     left_index = tab_indexes.pop()
 
+                    right_offset = -1
+
                     if(right_index == -1):
                         right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        right_offset = right_symbol.get_tab_offset()
                     else:
                         right_symbol_address = right_symbol.get_real_tab_index_address(right_index)
-                        right_index_address = -1
+                        right_index_address = 0
                         
 
                     if(left_index == -1):
                         left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        left_offset = left_symbol.get_tab_offset()
                     else:
                         left_symbol_address = left_symbol.get_real_tab_index_address(left_index)
-                        left_index_address = -1
+                        left_index_address = 0
                         
                     code_generator.manage_for_loop(
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
+                        left_offset=left_offset,
                         address_b=right_symbol_address,
-                        right_index_address=right_index_address
+                        right_index_address=right_index_address,
+                        right_offset=right_offset
                     )
                 #tab(a) + variable
                 else:
@@ -625,11 +644,11 @@ def p_cpmmand_do_occured(p):
                     if(left_index == -1):
                         left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
                     else:
-                        left_index_address = -1
+                        left_index_address = 0
                         left_symbol_address += left_index
 
-                    machine_math_manager.carry_out_operation(
-                        operation=p[3],
+                    code_generator.manage_for_loop(
+                        iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
                         address_b=right_symbol_address
@@ -646,8 +665,8 @@ def p_cpmmand_do_occured(p):
 
                 right_value = machine_math_values[1]
 
-                machine_math_manager.carry_out_operation(
-                    operation=p[3],
+                code_generator.manage_for_loop(
+                    iterator_address=iterator_address,
                     address_a=left_symbol_address,
                     left_index_address=left_index_address,
                     val_b=right_value
@@ -667,23 +686,23 @@ def p_cpmmand_do_occured(p):
                         right_index_address = 0
                         right_symbol_address += right_index
 
-                    machine_math_manager.carry_out_operation(
-                        operation=p[3],
+                    code_generator.manage_for_loop(
+                        iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         address_b=right_symbol_address,
                         right_index_address=right_index_address
                     )
                 #variable + variable
                 else:
-                    machine_math_manager.carry_out_operation(
-                        operation=p[3],
+                    code_generator.manage_for_loop(
+                        iterator_address=iterator_address,
                         address_a=get_symbol_address(machine_math_values[0]),
                         address_b=get_symbol_address(machine_math_values[1])
                     )
             #variable + number
             else:
-                machine_math_manager.carry_out_operation(
-                    operation=p[3],
+                code_generator.manage_for_loop(
+                    iterator_address=iterator_address,
                     address_a=get_symbol_address(machine_math_values[0]),
                     val_b = machine_math_values[1]
                 )
@@ -704,16 +723,16 @@ def p_cpmmand_do_occured(p):
                     right_index_address = 0
                     right_symbol_address += right_index
 
-                machine_math_manager.carry_out_operation(
-                    operation=p[3],
+                code_generator.manage_for_loop(
+                    iterator_address=iterator_address,
                     val_a=left_value,
                     address_b=right_symbol_address,
                     right_index_address=right_index_address,
                 )
             #number + variable
             else:
-                machine_math_manager.carry_out_operation(
-                    operation=p[3],
+                code_generator.manage_for_loop(
+                    iterator_address=iterator_address,
                     val_a = machine_math_values[0],
                     address_b=right_symbol_address
                 )
@@ -828,8 +847,7 @@ def p_command_write(p):
         symbol = get_symbol_by_name(p[2])
         if is_tab(p[2]):
             index = tab_indexes.pop()
-            value = symbol.get_tab_symbol_value(index)
-            if(index == -1 or value == -1):
+            if(index == -1):
                 code_generator.print_value_by_unknown_index(
                         address_a=get_symbol_address(last_read_symbols.pop()),
                         tab_start=get_symbol_address(p[2]),
@@ -1141,6 +1159,8 @@ def p_condition(p):
             left_symbol_address = left_symbol.get_address()
 
             if(left_symbol.is_tab):
+                left_offset = -1
+
                 if(right_is_var):
                     right_symbol = get_symbol_by_name(machine_condition_values[1])
                     right_symbol_address = right_symbol.get_address()
@@ -1148,50 +1168,62 @@ def p_condition(p):
                     if(right_symbol.is_tab):
                         right_index = tab_indexes.pop()
                         left_index = tab_indexes.pop()
+                        
+                        right_offset = -1
 
                         if(right_index == -1):
                             right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                            right_offset = right_symbol.get_tab_offset()
                         else:
                             right_index_address = 0
-                            right_symbol_address += right_index
+                            right_symbol_address += right_index - right_symbol.get_tab_offset()
 
                         if(left_index == -1):
                             left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                            left_offset = left_symbol.get_tab_offset()
                         else:
                             left_index_address = 0
-                            left_symbol_address += left_index
+                            left_symbol_address += left_index - left_symbol.get_tab_offset()
 
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
                             address_a=left_symbol_address,
                             left_index_address=left_index_address,
+                            left_offset=left_offset,
                             address_b=right_symbol_address,
-                            right_index_address= right_index_address
+                            right_index_address= right_index_address,
+                            right_offset=right_offset
                         )
                     #tab(a) [?] variable
                     else:
                         left_index = tab_indexes.pop()
+
                         if(left_index == -1):
                             left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                            left_offset = left_symbol.get_tab_offset()
                         else:
                             left_index_address = 0
-                            left_symbol_address += left_index
+                            left_symbol_address += left_index - left_symbol.get_tab_offset()
 
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
                             address_a=left_symbol_address,
                             left_index_address=left_index_address,
+                            left_offset=left_offset,
                             address_b=right_symbol_address
                         )
 
                 #tab(a) [?] value
                 else:
                     left_index = tab_indexes.pop()
+                    left_offset = -1
+
                     if(left_index == -1):
                         left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        left_offset = left_symbol.get_tab_offset()
                     else:
                         left_index_address = 0
-                        left_symbol_address += left_index
+                        left_symbol_address += left_index - left_symbol.get_tab_offset()
 
                     right_value = machine_condition_values[1]
 
@@ -1199,6 +1231,7 @@ def p_condition(p):
                         condition=condition,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
+                        left_offset=left_offset,
                         val_b=right_value
                     )
             else:
@@ -1209,18 +1242,21 @@ def p_condition(p):
                     #variable [?] tab(i)
                     if(right_symbol.is_tab):
                         right_index = tab_indexes.pop()
+                        right_offset = -1
                         
                         if(right_index == -1):
                             right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                            right_offset = right_symbol.get_tab_offset()
                         else:
                             right_index_address = 0
-                            right_symbol_address += right_index
+                            right_symbol_address += right_index - right_symbol.get_tab_offset()
 
                         machine_conditions_manager.carry_out_condition(
                             condition=condition,
                             address_a=left_symbol_address,
                             address_b=right_symbol_address,
-                            right_index_address=right_index_address
+                            right_index_address=right_index_address,
+                            right_offset=right_offset
                         )
                     #variable [?] variable
                     else:
@@ -1246,18 +1282,21 @@ def p_condition(p):
                 #number [?] tab(i)
                 if(right_symbol.is_tab):
                     right_index = tab_indexes.pop()
-                        
+                    right_offset = -1
+
                     if(right_index == -1):
                         right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        right_offset = right_symbol.get_tab_offset()
                     else:
                         right_index_address = 0
-                        right_symbol_address += right_index
+                        right_symbol_address += right_index - right_symbol.get_tab_offset()
 
                     machine_conditions_manager.carry_out_condition(
                         condition=condition,
                         val_a=left_value,
                         address_b=right_symbol_address,
                         right_index_address=right_index_address,
+                        right_offset=right_offset
                     )
                 #number [?] variable
                 else:
@@ -1283,6 +1322,9 @@ def p_identifier(p):
                   | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET'''
     global tab_indexes, last_read_symbols
     
+    if(in_for_loop[-1]):
+        last_read_symbols.append(p[1])
+
     if(len(p)>2 and type(p[3])==str):
         if(get_symbol_by_name(p[3]).get_symbol_value() == -1):
             last_read_symbols.append(p[3])
@@ -1298,7 +1340,7 @@ def p_identifier_tab(p):
     tab_indexes.append(p[3])
 
     if(in_for_loop[-1]):
-        last_read_symbols.append(p[0])
+        last_read_symbols.append(p[1])
 
 def p_error(p):
     print("[Błąd składni]")
