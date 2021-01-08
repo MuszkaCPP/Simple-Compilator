@@ -34,7 +34,7 @@ class Symbol():
         return self.start_address + index
 
     def get_real_tab_index_address(self, index):
-        return index - self.tab_offset
+        return self.start_address + (index - self.tab_offset)
 
     def get_symbol_value(self):
         return self.value

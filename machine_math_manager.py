@@ -8,9 +8,11 @@ class MachineMathManager():
                             val_a=-1,
                             address_a=-1,
                             left_index_address=-1,
+                            left_offset=-1,
                             val_b=-1,
                             address_b=-1,
                             right_index_address=-1,
+                            right_offset=-1,
         ):
 
         if(operation=='+'):
@@ -24,8 +26,10 @@ class MachineMathManager():
                 self.code_generator.add(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) + variable
             elif(address_a != -1
@@ -36,6 +40,7 @@ class MachineMathManager():
                 self.code_generator.add(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b
                 )
             #variable + tab(a)
@@ -47,7 +52,8 @@ class MachineMathManager():
                 self.code_generator.add(
                     address_b=address_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
+                    left_index_address=right_index_address,
+                    right_offset=right_offset
 
                 )
             #tab(a) + value
@@ -59,6 +65,7 @@ class MachineMathManager():
                 self.code_generator.add(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=val_b
                 )
             #value + tab(a)
@@ -70,7 +77,8 @@ class MachineMathManager():
                 self.code_generator.add(
                     val_b=val_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
+                    left_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #variable + variable
             elif(address_a != -1 and address_b != -1):
@@ -93,8 +101,10 @@ class MachineMathManager():
                 self.code_generator.sub(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) - variable
             elif(address_a != -1
@@ -105,6 +115,7 @@ class MachineMathManager():
                 self.code_generator.sub(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b
                 )
             #variable - tab(a)
@@ -116,8 +127,8 @@ class MachineMathManager():
                 self.code_generator.sub(
                     address_a=address_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
-
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) - value
             elif(address_a != -1 
@@ -128,6 +139,7 @@ class MachineMathManager():
                 self.code_generator.sub(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=val_b
                 )
             #value - tab(a)
@@ -139,7 +151,8 @@ class MachineMathManager():
                 self.code_generator.sub(
                     val_a=val_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #variable - variable
             elif(address_a != -1 and address_b != -1):
@@ -162,8 +175,10 @@ class MachineMathManager():
                 self.code_generator.mul(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) * variable
             elif(address_a != -1
@@ -174,6 +189,7 @@ class MachineMathManager():
                 self.code_generator.mul(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b
                 )
             #variable * tab(a)
@@ -185,8 +201,8 @@ class MachineMathManager():
                 self.code_generator.mul(
                     address_b=address_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
-
+                    left_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) * value
             elif(address_a != -1 
@@ -197,6 +213,7 @@ class MachineMathManager():
                 self.code_generator.mul(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=val_b
                 )
             #value * tab(a)
@@ -208,7 +225,8 @@ class MachineMathManager():
                 self.code_generator.mul(
                     val_b=val_a,
                     address_a=address_b,
-                    left_index_address=right_index_address
+                    left_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #variable * variable
             elif(address_a != -1 and address_b != -1):
@@ -231,8 +249,10 @@ class MachineMathManager():
                 self.code_generator.div(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) / variable
             elif(address_a != -1
@@ -243,6 +263,7 @@ class MachineMathManager():
                 self.code_generator.div(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b
                 )
             #variable / tab(a)
@@ -254,8 +275,8 @@ class MachineMathManager():
                 self.code_generator.div(
                     address_a=address_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
-
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #tab(a) / value
             elif(address_a != -1 
@@ -266,6 +287,7 @@ class MachineMathManager():
                 self.code_generator.div(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=val_b
                 )
             #value / tab(a)
@@ -277,7 +299,8 @@ class MachineMathManager():
                 self.code_generator.div(
                     val_a=val_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
             #variable / variable
             elif(address_a != -1 and address_b != -1):
@@ -300,8 +323,10 @@ class MachineMathManager():
                 self.code_generator.mod(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
 
             #tab(a) % variable
@@ -313,6 +338,7 @@ class MachineMathManager():
                 self.code_generator.mod(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     address_b=address_b
                 )
 
@@ -325,7 +351,8 @@ class MachineMathManager():
                 self.code_generator.mod(
                     address_a=address_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
 
             #tab(a) % value
@@ -337,6 +364,7 @@ class MachineMathManager():
                 self.code_generator.mod(
                     address_a=address_a,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=val_b
                 )
             #value % tab(a)
@@ -348,7 +376,8 @@ class MachineMathManager():
                 self.code_generator.mod(
                     val_a=val_a,
                     address_b=address_b,
-                    right_index_address=right_index_address
+                    right_index_address=right_index_address,
+                    right_offset=right_offset
                 )
 
             #variable % variable
