@@ -1,10 +1,11 @@
 
 class Symbol():
-    def __init__(self, pidentifier, address = 0, is_tab = False, start_index = 0, end_index = 0):
+    def __init__(self, pidentifier, address = 0, is_tab = False, start_index = 0, end_index = 0, is_iterator=False):
         self.pidentifier = pidentifier
         self.address = address
         self.is_tab = is_tab
         self.is_defined = False
+        self.is_iterator = is_iterator
         self.value = 0
         self.values = {}
         

@@ -749,7 +749,7 @@ class CodeGenerator():
             self.generated_code[length_before_jump-1] = "JUMP " + str(jump_value) + "\n"
 
     def manage_for_loop(self,
-        iterator_address,
+        iterator_address, loop_type='',
         val_a=-1, address_a=-1, left_index_address=-1, left_offset=-1,
         val_b=-1, address_b=-1, right_index_address=-1, right_offset=-1,
         ):
@@ -847,25 +847,90 @@ class CodeGenerator():
             self.generate_number_at_reg(val_a, 'a')
             self.generate_number_at_reg(val_b, 'b')
 
-        self.append_code("RESET d\n")
         self.append_code("RESET c\n")
-        self.append_code("DEC a\n")
-        self.generate_number_at_reg(iterator_address, 'c')
-        self.append_code("DEC a\n")
-        self.append_code("JZERO a 4\n")
-        self.append_code("INC a\n")
-        self.append_code("STORE a c\n")
-        self.append_code("JUMP 3\n")
-        self.append_code("STORE a c\n")
-        self.append_code("JUMP 3\n")
-        self.save_current_code_length()
-        self.append_code("INC a\n")
-        self.append_code("STORE a c\n")
         self.append_code("RESET d\n")
-        self.append_code("ADD d a\n")
-        self.check_registers_lower_equals('d', 'b')
+        self.append_code("RESET f\n")
 
-    
+        if(loop_type=='for_from_to'):
+            self.append_code("INC a\n")
+            self.append_code("INC b\n")
+            self.append_code("INC b\n")  
+            self.generate_offset('f')
+            val_b_address = self.current_data_offset
+
+            self.append_code("STORE b f\n")
+            self.generate_number_at_reg(iterator_address, 'c')
+            self.append_code("STORE a c\n")
+            self.generate_offset('f')
+            self.append_code("INC a\n")
+            tmp_iterator_address = self.current_data_offset
+            self.append_code("STORE a f\n")
+
+            self.save_current_code_length()
+
+            self.generate_number_at_reg(iterator_address, 'c')
+            self.append_code("RESET a\n")
+            self.append_code("LOAD a c\n")
+            self.generate_number_at_reg(val_b_address, 'f')
+            self.append_code("RESET b\n")
+            self.append_code("LOAD b f\n")
+            self.append_code("RESET f\n")
+            self.generate_number_at_reg(tmp_iterator_address, 'f')
+            self.append_code("RESET e\n")
+            self.append_code("LOAD e f\n")
+
+        elif(loop_type=='for_from_downto'):
+            self.append_code("INC a\n")
+            self.append_code("INC b\n")
+            self.append_code("INC b\n")  
+            self.generate_offset('f')
+            val_b_address = self.current_data_offset
+
+            self.append_code("STORE b f\n")
+            self.generate_number_at_reg(iterator_address, 'c')
+            self.append_code("STORE a c\n")
+            self.generate_offset('f')
+            self.append_code("INC a\n")
+            tmp_iterator_address = self.current_data_offset
+            self.append_code("STORE a f\n")
+
+            self.save_current_code_length()
+
+            self.generate_number_at_reg(iterator_address, 'c')
+            self.append_code("RESET a\n")
+            self.append_code("LOAD a c\n")
+            self.generate_number_at_reg(val_b_address, 'f')
+            self.append_code("RESET b\n")
+            self.append_code("LOAD b f\n")
+            self.append_code("RESET f\n")
+            self.generate_number_at_reg(tmp_iterator_address, 'f')
+            self.append_code("RESET e\n")
+            self.append_code("LOAD e f\n")
+
+        if(loop_type=='for_from_to'):
+            self.append_code("RESET a\n")
+            self.append_code("ADD a e\n")
+            self.append_code("DEC a\n")
+            self.append_code("DEC a\n")
+            self.append_code("STORE a c\n")
+            self.append_code("RESET d\n")
+            self.append_code("ADD d e\n")
+            self.append_code("INC e\n")
+            self.append_code("STORE e f\n")
+            self.check_registers_lower_equals('d', 'b')
+        elif(loop_type=='for_from_downto'):
+            self.append_code("RESET a\n")
+            self.append_code("ADD a e\n")
+            self.append_code("DEC a\n")
+            self.append_code("DEC a\n")
+            self.append_code("STORE a c\n")
+            self.append_code("RESET d\n")
+            self.append_code("ADD d e\n")
+            self.append_code("DEC e\n")
+            self.append_code("STORE e f\n")
+            self.check_registers_lower_than('b', 'd', _for_loop=True)
+
+            
     def save_current_code_length(self):
         self.length_before_jump.append(len(self.generated_code))
 
@@ -894,7 +959,21 @@ class CodeGenerator():
         self.append_code(" \n")
         self.length_before_jump.append(len(self.generated_code))
 
-    def check_registers_lower_than(self, reg_1, reg_2):
+    def check_registers_lower_than(self, reg_1, reg_2, _for_loop=False):
+        if(_for_loop):
+            self.append_code("DEC " + str(reg_2) + "\n")
+            self.append_code("JZERO " + str(reg_2) + " 3\n")
+            self.append_code("INC " + str(reg_2) + "\n")
+            self.append_code("JUMP 8\n")
+            self.append_code("INC " + str(reg_2) + "\n")
+            self.append_code("SUB " + str(reg_2) + " " + str(reg_1) + "\n")
+            self.append_code("JZERO " + str(reg_2) + " 3\n") #--> if b>a JUMP
+
+            self.append_code("DEC " + str(reg_2) + "\n")
+
+            self.append_code("JZERO " + str(reg_2) + " 2\n") #--> JUMP if True
+            self.append_code("JUMP 4\n")
+
         self.append_code("INC " + str(reg_1) + "\n")
         self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
         self.append_code("JZERO " + str(reg_1) + " 2\n") #--> if b>a JUMP
@@ -902,10 +981,10 @@ class CodeGenerator():
         self.append_code(" \n")
         self.length_before_jump.append(len(self.generated_code))
 
-    def check_registers_lower_equals(self, reg_1, reg_2):
+    def check_registers_lower_equals(self, reg_1, reg_2,):
         self.append_code("INC " + str(reg_1) + "\n")
         self.append_code("SUB " + str(reg_1) + " " + str(reg_2) + "\n")
-        self.append_code("JZERO " + str(reg_1) + " 4\n") #--> if b>a JUMP
+        self.append_code("JZERO " + str(reg_1) + " 4\n") #--> if b>a JUMP d>=b
 
         self.append_code("DEC " + str(reg_1) + "\n")
 
@@ -999,7 +1078,7 @@ class CodeGenerator():
         self.append_code("ADD b c\n")
         self.append_code("SUB b d\n")
         self.append_code("GET b\n")
-
+    
     def print_value_by_unknown_index(self, address_a, tab_start, tab_offset):
         self.append_code("RESET a\n")
         self.append_code("RESET b\n")
@@ -1087,7 +1166,7 @@ class CodeGenerator():
         self.append_code("SUB b e\n")
         self.append_code("RESET d\n")
         self.append_code("LOAD d b\n")
-        self.append_code("STORE b a\n")
+        self.append_code("STORE d a\n")
 
     def store_from_reg_to_unknown_index(self, reg, tab_address, index_address, tab_offset):
         #Value in reg e!

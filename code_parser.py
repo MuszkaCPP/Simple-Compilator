@@ -521,11 +521,21 @@ def p_command_assignment(p):
                 if(is_tab(p[3])):
                     index = tab_indexes.pop()
                     value = symbol_asgn.get_tab_symbol_value(index)
-                    if(value == -1):
+                    if(index==-1):
+                        index_address = get_symbol_address(last_read_symbols.pop())
+                        code_generator.store_unknown_index_at_known_address(
+                            known_address=symbol.get_address(),
+                            tab_address=symbol_asgn.get_address(),
+                            index_address=index_address,
+                            tab_offset=symbol_asgn.get_tab_offset()
+                        )
+                        symbol.set_value(-1)
+                    elif(value == -1):
                         code_generator.store_from_address_to_address(
                             symbol_asgn.get_real_tab_index_address(index),
                             symbol.get_address()
                         )
+                        symbol.set_value(-1)
                     else:
                         code_generator.store_value_at_address(
                                         value,
@@ -533,7 +543,7 @@ def p_command_assignment(p):
                                         'a'
                         )
                         
-                    symbol.set_value(value)
+                        symbol.set_value(value)
 
                 # variable = variable
                 else:
@@ -571,13 +581,28 @@ def p_command_assignment(p):
 
 def p_command_for_down_to(p):
     'command : FOR  for_occured  pidentifier  get_pidentifier FROM  value first_value DOWNTO  value second_value DO do_occured commands  ENDFOR'
+    global machine_conditions, symbols
+
+    code_generator.replace_jump_for_condition(pop=True, _for=True)
+
+    for symbol in reversed(symbols):
+        if(symbol.is_iterator):
+            symbols.remove(symbol)
+            break
+
+    in_for_loop.pop()
 
 def p_command_for_from_to(p):
     'command : FOR  for_occured  pidentifier  get_pidentifier FROM  value first_value TO  value second_value DO do_occured commands  ENDFOR'
 
-    global machine_conditions
+    global machine_conditions, symbols
 
     code_generator.replace_jump_for_condition(pop=True, _for=True)
+
+    for symbol in reversed(symbols):
+        if(symbol.is_iterator):
+            symbols.remove(symbol)
+            break
 
     in_for_loop.pop()
 
@@ -601,11 +626,13 @@ def p_command_get_pidentifier(p):
     'get_pidentifier :'
 
     global symbols
-    pidentifier = p.stack[-1].value
-    iterator = Symbol(pidentifier, code_generator.get_data_offset())
-    iterator.set_value(-1)
 
+    pidentifier = p.stack[-1].value
+
+    iterator = Symbol(pidentifier, code_generator.get_data_offset(), is_iterator=True)
+    iterator.set_value(-1)
     symbols.append(iterator)
+
 def p_command_do_occured(p):
     'do_occured :'
 
@@ -615,6 +642,13 @@ def p_command_do_occured(p):
 
     iterator = symbols[-1]
     iterator_address = iterator.get_address()
+
+    loop_type = ''
+
+    if(p.stack[-4].value == 'TO'):
+        loop_type='for_from_to'
+    else:
+        loop_type='for_from_downto'
 
     if(symbol_exists(for_loop_borders[1])):
         right_is_var = True
@@ -655,6 +689,7 @@ def p_command_do_occured(p):
                         left_index_address = 0
                         
                     code_generator.manage_for_loop(
+                        loop_type=loop_type,
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
@@ -673,6 +708,7 @@ def p_command_do_occured(p):
                         left_symbol_address = left_symbol.get_real_tab_index_address(left_index)
 
                     code_generator.manage_for_loop(
+                        loop_type=loop_type,
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
@@ -692,6 +728,7 @@ def p_command_do_occured(p):
                 right_value = for_loop_borders[1]
 
                 code_generator.manage_for_loop(
+                    loop_type=loop_type,
                     iterator_address=iterator_address,
                     address_a=left_symbol_address,
                     left_index_address=left_index_address,
@@ -715,6 +752,7 @@ def p_command_do_occured(p):
                         right_index_address = 0
 
                     code_generator.manage_for_loop(
+                        loop_type=loop_type,
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         address_b=right_symbol_address,
@@ -724,6 +762,7 @@ def p_command_do_occured(p):
                 #variable TO variable
                 else:
                     code_generator.manage_for_loop(
+                        loop_type=loop_type,
                         iterator_address=iterator_address,
                         address_a=left_symbol.get_address(),
                         address_b=right_symbol.get_address()
@@ -731,9 +770,10 @@ def p_command_do_occured(p):
             #variable TO number
             else:
                 code_generator.manage_for_loop(
+                    loop_type=loop_type,
                     iterator_address=iterator_address,
                     address_a=left_symbol.get_address(),
-                    val_b=for_loop_borders[0]
+                    val_b=for_loop_borders[1]
                 )
     elif(right_is_var):
         right_symbol_address = right_symbol.get_address()
@@ -752,6 +792,7 @@ def p_command_do_occured(p):
                 right_index_address = 0
 
             code_generator.manage_for_loop(
+                loop_type=loop_type,
                 iterator_address=iterator_address,
                 val_a=left_value,
                 address_b=right_symbol_address,
@@ -761,6 +802,7 @@ def p_command_do_occured(p):
         #number TO variable
         elif(right_symbol != None):
             code_generator.manage_for_loop(
+                loop_type=loop_type,
                 iterator_address=iterator_address,
                 val_a = left_value,
                 address_b=right_symbol_address
@@ -769,13 +811,15 @@ def p_command_do_occured(p):
     else:
         left_value = for_loop_borders[0]
         right_value = for_loop_borders[1]
+
         code_generator.manage_for_loop(
+            loop_type=loop_type,
             iterator_address=iterator_address,
             val_a=left_value,
             val_b=right_value
         )
 
-    for_loop_borders[2:]
+    for_loop_borders = for_loop_borders[2:]
 
 
 def p_command_for_occured(p):
@@ -1378,9 +1422,6 @@ def p_identifier_tab(p):
     global tab_indexes
     p[0] = p[1]
     tab_indexes.append(p[3])
-
-    if(in_for_loop[-1]):
-        last_read_symbols.append(p[1])
 
 def p_error(p):
     print("[Błąd składni]")
