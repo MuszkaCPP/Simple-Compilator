@@ -570,10 +570,10 @@ def p_command_assignment(p):
         
 
 def p_command_for_down_to(p):
-    'command : FOR  for_occured  pidentifier  FROM  value  DOWNTO  value DO do_occured commands  ENDFOR'
+    'command : FOR  for_occured  pidentifier  get_pidentifier FROM  value first_value DOWNTO  value second_value DO do_occured commands  ENDFOR'
 
 def p_command_for_from_to(p):
-    'command : FOR  for_occured  pidentifier  FROM  value TO  value DO do_occured commands  ENDFOR'
+    'command : FOR  for_occured  pidentifier  get_pidentifier FROM  value first_value TO  value second_value DO do_occured commands  ENDFOR'
 
     global machine_conditions
 
@@ -581,22 +581,47 @@ def p_command_for_from_to(p):
 
     in_for_loop.pop()
 
+def p_command_first_value(p):
+    'first_value :'
 
+    global for_loop_borders
+
+    value = p.stack[-1].value
+    for_loop_borders.append(value)
+
+def p_command_second_value(p):
+    'second_value :'
+
+    global for_loop_borders
+
+    value = p.stack[-1].value
+    for_loop_borders.append(value)
+
+def p_command_get_pidentifier(p):
+    'get_pidentifier :'
+
+    global symbols
+    pidentifier = p.stack[-1].value
+    iterator = Symbol(pidentifier, code_generator.get_data_offset())
+    iterator.set_value(-1)
+
+    symbols.append(iterator)
 def p_command_do_occured(p):
     'do_occured :'
 
-    global last_read_symbols, tab_indexes
+    global last_read_symbols, tab_indexes, symbols, for_loop_borders
     left_is_var, right_is_var = False, False
     left_symbol, right_symbol = None, None
 
-    iterator_address = code_generator.get_data_offset()
+    iterator = symbols[-1]
+    iterator_address = iterator.get_address()
 
-    if(symbol_exists(last_read_symbols[-1])):
+    if(symbol_exists(for_loop_borders[1])):
         right_is_var = True
-        right_symbol = get_symbol_by_name(last_read_symbols.pop())
-    if(symbol_exists(last_read_symbols[-1])):
+        right_symbol = get_symbol_by_name(for_loop_borders[1])
+    if(symbol_exists(for_loop_borders[0])):
         left_is_var = True
-        left_symbol = get_symbol_by_name(last_read_symbols.pop())
+        left_symbol = get_symbol_by_name(for_loop_borders[0])
 
 
     if(left_is_var):
@@ -607,7 +632,7 @@ def p_command_do_occured(p):
             if(right_is_var):
                 
                 right_symbol_address = right_symbol.get_address()
-                #tab(a) [+] tab(b)
+                #tab(a) TO tab(b)
                 if(right_symbol.is_tab):
                     right_index = tab_indexes.pop()
                     left_index = tab_indexes.pop()
@@ -638,104 +663,119 @@ def p_command_do_occured(p):
                         right_index_address=right_index_address,
                         right_offset=right_offset
                     )
-                #tab(a) + variable
+                #tab(a) TO variable
                 else:
                     left_index = tab_indexes.pop()
                     if(left_index == -1):
                         left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
                     else:
                         left_index_address = 0
-                        left_symbol_address += left_index
+                        left_symbol_address = left_symbol.get_real_tab_index_address(left_index)
 
                     code_generator.manage_for_loop(
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         left_index_address=left_index_address,
+                        left_offset=left_offset,
                         address_b=right_symbol_address
                     )
 
-            #tab(a) + value
+            #tab(a) TO value
             else:
                 left_index = tab_indexes.pop()
                 if(left_index == -1):
                     left_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
                 else:
                     left_index_address = 0
-                    left_symbol_address += left_index
+                    left_symbol_address = left_symbol.get_real_tab_index_address(left_index)
 
-                right_value = machine_math_values[1]
+                right_value = for_loop_borders[1]
 
                 code_generator.manage_for_loop(
                     iterator_address=iterator_address,
                     address_a=left_symbol_address,
                     left_index_address=left_index_address,
+                    left_offset=left_offset,
                     val_b=right_value
                 )
         else:
             if(right_is_var):
-                right_symbol = get_symbol_by_name(machine_math_values[1])
                 right_symbol_address = right_symbol.get_address()
 
-                #variable + tab(i)
+                #variable TO tab(i)
                 if(right_symbol.is_tab):
                     right_index = tab_indexes.pop()
-                    
+                    right_offset = -1
+
                     if(right_index == -1):
                         right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                        right_offset = right_symbol.get_tab_offset()
                     else:
+                        right_symbol_address = right_symbol.get_real_tab_index_address(right_index)
                         right_index_address = 0
-                        right_symbol_address += right_index
 
                     code_generator.manage_for_loop(
                         iterator_address=iterator_address,
                         address_a=left_symbol_address,
                         address_b=right_symbol_address,
-                        right_index_address=right_index_address
+                        right_index_address=right_index_address,
+                        right_offset=right_offset
                     )
-                #variable + variable
+                #variable TO variable
                 else:
                     code_generator.manage_for_loop(
                         iterator_address=iterator_address,
-                        address_a=get_symbol_address(machine_math_values[0]),
-                        address_b=get_symbol_address(machine_math_values[1])
+                        address_a=left_symbol.get_address(),
+                        address_b=right_symbol.get_address()
                     )
-            #variable + number
+            #variable TO number
             else:
                 code_generator.manage_for_loop(
                     iterator_address=iterator_address,
-                    address_a=get_symbol_address(machine_math_values[0]),
-                    val_b = machine_math_values[1]
+                    address_a=left_symbol.get_address(),
+                    val_b=for_loop_borders[0]
                 )
+    elif(right_is_var):
+        right_symbol_address = right_symbol.get_address()
+        left_value = for_loop_borders[0]
+
+        #number TO tab(i)
+        if(right_symbol.is_tab):
+            right_index = tab_indexes.pop()
+            right_offset = -1
+
+            if(right_index == -1):
+                right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
+                right_offset = right_symbol.get_tab_offset()
+            else:
+                right_symbol_address = right_symbol.get_real_tab_index_address(right_index)
+                right_index_address = 0
+
+            code_generator.manage_for_loop(
+                iterator_address=iterator_address,
+                val_a=left_value,
+                address_b=right_symbol_address,
+                right_index_address=right_index_address,
+                right_offset=right_offset
+            )
+        #number TO variable
+        elif(right_symbol != None):
+            code_generator.manage_for_loop(
+                iterator_address=iterator_address,
+                val_a = left_value,
+                address_b=right_symbol_address
+            )
+    #number TO number
     else:
-        
-        if(right_is_var):
-            right_symbol = get_symbol_by_name(machine_math_values[1])
-            right_symbol_address = right_symbol.get_address()
-            left_value = machine_math_values[0]
+        left_value = for_loop_borders[0]
+        right_value = for_loop_borders[1]
+        code_generator.manage_for_loop(
+            iterator_address=iterator_address,
+            val_a=left_value,
+            val_b=right_value
+        )
 
-            #number + tab(i)
-            if(right_symbol.is_tab):
-                right_index = tab_indexes.pop()
-                    
-                if(right_index == -1):
-                    right_index_address = get_symbol_by_name(last_read_symbols.pop()).get_address()
-                else:
-                    right_index_address = 0
-                    right_symbol_address += right_index
-
-                code_generator.manage_for_loop(
-                    iterator_address=iterator_address,
-                    val_a=left_value,
-                    address_b=right_symbol_address,
-                    right_index_address=right_index_address,
-                )
-            #number + variable
-            else:
-                code_generator.manage_for_loop(
-                    iterator_address=iterator_address,
-                    val_a = machine_math_values[0],
-                    address_b=right_symbol_address
-                )
+    for_loop_borders[2:]
 
 
 def p_command_for_occured(p):
@@ -1320,10 +1360,10 @@ def p_value_identifier(p):
 def p_identifier(p):
     '''identifier : pidentifier
                   | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET'''
-    global tab_indexes, last_read_symbols
+    global tab_indexes, last_read_symbols, for_loop_borders, in_for_loop
     
-    if(in_for_loop[-1]):
-        last_read_symbols.append(p[1])
+    # if(in_for_loop[-1]):
+    #     last_read_symbols.append(p[1])
 
     if(len(p)>2 and type(p[3])==str):
         if(get_symbol_by_name(p[3]).get_symbol_value() == -1):
@@ -1367,6 +1407,8 @@ machine_conditions = []
 in_while_loop = [False]
 in_repeat_loop = [False]
 in_for_loop = [False]
+
+for_loop_borders = []
 
 def symbol_exists(pidentifier):
     for symbol in symbols:

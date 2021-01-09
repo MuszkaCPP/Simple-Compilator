@@ -1,13 +1,18 @@
-
+[ Silnia  +  Fibonacci
+20
+2432902008176640000 17711
+]
 DECLARE
-	a,b,t(120:123)
+    f(0:100), s(0:100), i(0:100), n, k, l
 BEGIN
-  a:=10;
-  READ t(120);
-  READ t(123);
-  FOR k FROM t(120) TO t(123) DO
-    WRITE a;
-  ENDFOR
-
+    READ n;
+    f(0):=1;
+    s(0):=1;
+    i(0):=0;
+    FOR j FROM 1 TO n DO
+        k:=j-1;
+        l:=k-1;
+    ENDFOR
+    WRITE s(n);
+    WRITE f(n);
 END
-

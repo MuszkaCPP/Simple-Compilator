@@ -849,14 +849,21 @@ class CodeGenerator():
 
         self.append_code("RESET d\n")
         self.append_code("RESET c\n")
+        self.append_code("DEC a\n")
         self.generate_number_at_reg(iterator_address, 'c')
-        self.append_code("STORE a c\n")
-        self.save_current_code_length()
-        self.append_code("RESET d\n")
-        self.append_code("ADD d a\n")
-        self.check_registers_lower_than('d', 'b')
+        self.append_code("DEC a\n")
+        self.append_code("JZERO a 4\n")
         self.append_code("INC a\n")
         self.append_code("STORE a c\n")
+        self.append_code("JUMP 3\n")
+        self.append_code("STORE a c\n")
+        self.append_code("JUMP 3\n")
+        self.save_current_code_length()
+        self.append_code("INC a\n")
+        self.append_code("STORE a c\n")
+        self.append_code("RESET d\n")
+        self.append_code("ADD d a\n")
+        self.check_registers_lower_equals('d', 'b')
 
     
     def save_current_code_length(self):
