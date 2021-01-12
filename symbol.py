@@ -47,6 +47,7 @@ class Symbol():
     def set_value(self, value):
         if(self.value != -1):
             self.value = value
+            self.is_defined = True
 
     def set_address(self, address):
         self.address = address

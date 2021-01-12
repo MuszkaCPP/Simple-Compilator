@@ -82,6 +82,10 @@ t_GEQ = r'>='
 #ignore
 t_ignore_RUBBISH = r'[ \t\n]+'
 
+def t_unknown_symbol(t):
+    r'[a-z|A-Z]+[0-9]+ | [0-9]+[a-z|A-Z]+'
+    throw_unknown_symbol_error(t)
+
 #Comment
 def t_comment(t):
     r'\['
@@ -147,10 +151,13 @@ def p_declarations_muliple(p):
                     | declarations COMMA pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'''
 
     if symbol_exists(p[3]):
-        throw_redeclare_error(p,3)
+        throw_redeclare_error(p[3])
     if len(p) == 4:
         symbol = Symbol(p[3], code_generator.get_data_offset())
     else:
+        if(p[5]>p[7]):
+            throw_wrong_tab_bounds(p[5],p[7])
+
         symbol = Symbol(p[3], code_generator.get_data_offset(), True, p[5], p[7])
         code_generator.increase_data_offset(symbol.get_tab_length()-1)
     symbols.append(symbol)
@@ -159,7 +166,7 @@ def p_declarations_single_var(p):
     'declarations : pidentifier'
 
     if symbol_exists(p[1]):
-        throw_redeclare_error(p,1)
+        throw_redeclare_error(p[1])
     p[0] = p[1]
 
     symbol = Symbol(p[1], code_generator.get_data_offset())
@@ -168,16 +175,14 @@ def p_declarations_single_var(p):
 def p_declarations_single_tab(p):
     'declarations : pidentifier LEFT_BRACKET NUM COLON NUM RIGHT_BRACKET'
     if symbol_exists(p[1]):
-        throw_redeclare_error(p,1)
+        throw_redeclare_error(p[1])
+    if(p[3]>p[5]):
+        throw_wrong_tab_bounds(p[3],p[5])
 
     p[0] = p[1]
     symbol = Symbol(p[1], code_generator.get_data_offset(), True, p[3], p[5])
     symbols.append(symbol)
     code_generator.increase_data_offset(symbol.get_tab_length()-1)
-
-def throw_redeclare_error(p, index):
-    print("[Error] Line: [" + str(p.lineno(1)) + "] | Symbol redeclared! [" + str(p[index]) + "]")
-    exit(-1)
 
 def p_commands(p):
     '''commands : commands command
@@ -215,6 +220,18 @@ def p_command_assignment(p):
     'command : identifier ASSIGNMENT expression SEMICOLON'
 
     global tab_indexes, left_is_var, right_is_var, machine_math_manager, machine_math_values, machine_math, last_read_symbols,if_passes
+
+    if(symbol_exists(p[3])
+        and get_symbol_by_name(p[3]).get_symbol_value() == 0
+        and not get_symbol_by_name(p[3]).is_tab
+        ):
+        throw_using_undeclared_error(p[3])
+
+    if(symbol_exists(p[1]) and get_symbol_by_name(p[1]).is_tab and len(tab_indexes) == 0):
+        throw_wrong_symbol_usage_error(p[1])
+
+    if(symbol_exists(p[1]) and get_symbol_by_name(p[1]).is_iterator is True):
+        throw_iterator_modifying_error(p[1])
 
     if(len(if_passes)>1 and not if_passes[-2]):
         return
@@ -612,6 +629,13 @@ def p_command_first_value(p):
     global for_loop_borders
 
     value = p.stack[-1].value
+
+    if(symbol_exists(value)):
+        if(get_symbol_by_name(value).is_defined is not True):
+            throw_using_undeclared_error(value)
+        if(get_symbol_by_name(value).is_iterator is True and len(in_for_loop)==1):
+            throw_wrong_symbol_usage_error(value)
+
     for_loop_borders.append(value)
 
 def p_command_second_value(p):
@@ -620,6 +644,13 @@ def p_command_second_value(p):
     global for_loop_borders
 
     value = p.stack[-1].value
+
+    if(symbol_exists(value)):
+        if(get_symbol_by_name(value).is_defined is not True):
+            throw_using_undeclared_error(value)
+        if(get_symbol_by_name(value).is_iterator is True and len(in_for_loop)==1):
+            throw_wrong_symbol_usage_error(value)
+
     for_loop_borders.append(value)
 
 def p_command_get_pidentifier(p):
@@ -917,6 +948,13 @@ def p_if_occured(p):
 
 def p_command_write(p):
     'command : WRITE value SEMICOLON'
+
+    if(symbol_exists(p[2]) 
+        and not get_symbol_by_name(p[2]).is_tab 
+        and get_symbol_by_name(p[2]).get_symbol_value()==0
+        ):
+        throw_using_undeclared_error(p[2])
+        
 
     global tab_indexes, last_read_symbols, in_if_statement, if_passes
 
@@ -1399,6 +1437,10 @@ def p_value_num(p):
 
 def p_value_identifier(p):
     'value : identifier'
+
+    if(not symbol_exists(p[1])):
+        throw_undeclared_error(p[1])
+
     p[0] = p[1]
     
 def p_identifier(p):
@@ -1406,10 +1448,17 @@ def p_identifier(p):
                   | pidentifier LEFT_BRACKET pidentifier RIGHT_BRACKET'''
     global tab_indexes, last_read_symbols, for_loop_borders, in_for_loop
     
-    # if(in_for_loop[-1]):
-    #     last_read_symbols.append(p[1])
+    if(not symbol_exists(p[1])):
+        throw_undeclared_error(p[1])
 
     if(len(p)>2 and type(p[3])==str):
+        if(not symbol_exists(p[3])):
+            throw_undeclared_error(p[3])
+        if(get_symbol_by_name(p[3]).is_defined is not True):
+            throw_using_undeclared_error(p[3])
+        if(not get_symbol_by_name(p[1]).is_tab):
+            throw_wrong_symbol_usage_error(p[1]) 
+
         if(get_symbol_by_name(p[3]).get_symbol_value() == -1):
             last_read_symbols.append(p[3])
         index = get_symbol_by_name(p[3]).get_symbol_value()
@@ -1420,11 +1469,52 @@ def p_identifier(p):
 def p_identifier_tab(p):
     'identifier : pidentifier LEFT_BRACKET NUM RIGHT_BRACKET'
     global tab_indexes
+
+    if(not symbol_exists(p[1])):
+        throw_undeclared_error(p[1])
+    if(symbol_exists(p[1]) and not get_symbol_by_name(p[1]).is_tab):
+        throw_wrong_symbol_usage_error(p[1])
+
     p[0] = p[1]
     tab_indexes.append(p[3])
 
+
+#Errors
+def throw_undeclared_error(value):
+    print("[Error] Symbol undeclared! [" + str(value) + "]")
+    exit(-1)
+
+def throw_redeclare_error(value):
+    print("[Error] Symbol redeclared! [" + str(value) + "]")
+    exit(-1)
+
+def throw_using_undeclared_error(value):
+    print("[Error] Using undeclared symbol! [" + str(value) + "]")
+    exit(-1)
+
+def throw_unknown_symbol_error(t):
+    print("[Error] Wrong symbol name! [" + str(t.value) + "]")
+    exit(-1)
+
+def throw_wrong_symbol_usage_error(sign):
+    print("[Error] Wrong symbol usage! [" + str(sign) + "]")
+    exit(-1)
+
+def throw_wrong_sign_error(t):
+    print("[Error] Wrong sign! [" + str(t) + "]")
+    exit(-1)
+
+def throw_wrong_tab_bounds(left_bound, right_bound):
+    print("[Error] Wrong tab bounds! [" + str(left_bound) + " : " + str(right_bound) + "]")
+    exit(-1)
+
+def throw_iterator_modifying_error(value):
+    print("[Error] Iterator is being modified! [" + str(value) + "]")
+    exit(-1)
+
 def p_error(p):
-    print("[Błąd składni]")
+    print("[Syntax Error] " + str(p.value))
+    exit(-1)
 
 lexer = lex.lex()
 parser = yacc.yacc(start='program')
