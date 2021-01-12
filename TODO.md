@@ -1,4 +1,0 @@
-- **ZROBIC SPRAWDZANIE INDEKSOW W TABLICY!**
-- **DODAC OBSLUGE LICZB UJEMNYCH!!**
-- **DOPISAC REGISTER MANAGER (usunac resetowanie rejestrow, szukanie najbardziej optymalnego itd..)**
-- **poprawic 1 % 1**
