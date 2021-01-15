@@ -3,10 +3,12 @@ class MachineController():
     def __init__(self,
                 machine_math_manager,
                 machine_conditions_manager,
+                assignment_manager,
                 code_generator
                 ):
         self.machine_math_manager = machine_math_manager
         self.machine_conditions_manager = machine_conditions_manager
+        self.assignment_manager = assignment_manager
         self.code_generator = code_generator
         self.tab_indexes = []
         self.last_read_symbols = []
@@ -66,7 +68,14 @@ class MachineController():
                         else:
                             left_index_address = 0
                             left_symbol_address += left_index - left_symbol.get_tab_offset()
-
+                            
+                            if task=='assignment' and right_index != -1:
+                                right_value = right_symbol.get_tab_symbol_value(right_index)
+                                if right_value == -1 :
+                                    left_symbol.set_tab_symbol_value_at_index(-1, left_index)
+                                else:
+                                    left_symbol.set_tab_symbol_value_at_index(right_value, left_index)
+                                
                         self.pass_task_to_machine(
                             task=task, task_value=task_value,
                             loop_type=loop_type, iterator_address=iterator_address,
@@ -87,7 +96,14 @@ class MachineController():
                         else:
                             left_index_address = 0
                             left_symbol_address += left_index - left_symbol.get_tab_offset()
-
+                            
+                            if task=='assignment':
+                                right_value = right_symbol.get_symbol_value()
+                                if right_value == -1:
+                                    left_symbol.set_tab_symbol_value_at_index(-1, left_index)
+                                else:
+                                    left_symbol.set_tab_symbol_value_at_index(right_value, left_index)
+                                    
                         self.pass_task_to_machine(
                             task=task, task_value=task_value,
                             loop_type=loop_type, iterator_address=iterator_address,
@@ -110,6 +126,9 @@ class MachineController():
                         left_symbol_address += left_index - left_symbol.get_tab_offset()
 
                     right_value = self.machine_values[1]
+                    
+                    if task=='assignment' and left_index != -1:
+                        left_symbol.set_tab_symbol_value_at_index(right_value, left_index)
 
                     self.pass_task_to_machine(
                         task=task, task_value=task_value,
@@ -135,6 +154,16 @@ class MachineController():
                         else:
                             right_index_address = 0
                             right_symbol_address += right_index - right_symbol.get_tab_offset()
+                            
+                        if task=='assignment':
+                            if right_index==-1:
+                                left_symbol.set_value(-1)
+                            else:
+                                right_value = right_symbol.get_tab_symbol_value(right_index)
+                                if right_value==-1:
+                                    left_symbol.set_value(-1)
+                                else:
+                                    left_symbol.set_value(right_value)
                         
                         self.pass_task_to_machine(
                             task=task, task_value=task_value,
@@ -146,6 +175,13 @@ class MachineController():
                         )
                     #variable [?] variable
                     else:
+                        right_value = right_symbol.get_symbol_value()
+                        if task=='assignment':
+                            if right_value == -1:
+                                left_symbol.set_value(-1)
+                            else:
+                                left_symbol.set_value(right_value)
+                            
                         self.pass_task_to_machine(
                             task=task, task_value=task_value,
                             loop_type=loop_type, iterator_address=iterator_address,
@@ -154,15 +190,20 @@ class MachineController():
                         )
                 #variable [?] number
                 else:
-                    
+                    right_value = self.machine_values[1]
+                    if task=='assignment':
+                        left_symbol.set_value(right_value)
+                        
                     self.pass_task_to_machine(
                         task=task, task_value=task_value,
                         loop_type=loop_type, iterator_address=iterator_address,
                         left_symbol_address=left_symbol_address,
-                        right_value = self.machine_values[1]
+                        right_value=right_value
                     )
-        else:
-            
+                    
+            if(not left_symbol.is_defined):
+                left_symbol.is_defined = True
+        else: 
             if(right_is_var):
                 right_symbol = self.get_symbol_by_name(self.machine_values[1])
                 right_symbol_address = right_symbol.get_address()
@@ -242,6 +283,17 @@ class MachineController():
                 right_index_address=right_index_address,
                 right_offset=right_offset
             )
+        elif task=='assignment':
+            self.assignment_manager.carry_out_assignment(
+                left_value=left_value,
+                left_symbol_address=left_symbol_address,
+                left_index_address=left_index_address,
+                left_offset=left_offset,
+                right_value=right_value,
+                right_symbol_address=right_symbol_address,
+                right_index_address=right_index_address,
+                right_offset=right_offset
+            )
         elif task=='condition':
             self.machine_conditions_manager.carry_out_condition(
                 condition=task_value,
@@ -267,7 +319,6 @@ class MachineController():
                 right_index_address=right_index_address,
                 right_offset=right_offset
             )
-            
-            
+                   
     def get_stacks(self):
         return  self.tab_indexes, self.last_read_symbols, self.machine_values

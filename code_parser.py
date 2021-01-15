@@ -6,6 +6,7 @@ from code_generator import CodeGenerator
 from machine_math_manager import MachineMathManager
 from machine_conditions_manager import MachineConditionsManager
 from machine_controller import MachineController
+from assignment_manager import AssignmentManager
 
 tokens = (
     "READ",
@@ -304,188 +305,51 @@ def p_command_assignment(p):
                 address=left_side_symbol.get_address(),
                 reg='e'
             )
-
-
+        
         left_is_var = False
         right_is_var = False
         machine_math = False
         return
 
-
     if p[2] == ":=":
-
-        symbol = get_symbol_by_name(p[1])
-
-        # tab(i) := []
-        if(is_tab(p[1])):
-            if(symbol_exists(p[3])):
-                symbol_asgn = get_symbol_by_name(p[3])
-
-                # tab(i) := tab_2(i)
-                if(is_tab(p[3])):
-                    right_index = tab_indexes.pop()
-                    left_index = tab_indexes.pop()
-                    value = symbol_asgn.get_tab_symbol_value(right_index)
-
-                    #tab(a) dla READ a
-                    if(left_index == -1 and right_index == -1):
-                        right_index_address = get_symbol_address(last_read_symbols.pop())
-                        left_index_address = get_symbol_address(last_read_symbols.pop())
-
-                        code_generator.store_unknown_tab_with_unknown_indexes(
-                                        right_tab_address=symbol_asgn.get_address(),
-                                        right_index_address=right_index_address,
-                                        right_tab_offset=symbol_asgn.get_tab_offset(),
-                                        left_tab_address=symbol.get_address(),
-                                        left_index_address=left_index_address,
-                                        left_tab_offset=symbol.get_tab_offset()
-                        )
-                    elif(right_index == -1):
-                        right_index_address = get_symbol_address(last_read_symbols.pop())
-
-                        code_generator.store_unknown_index_at_known_address(
-                            known_address=symbol.get_real_tab_index_address(left_index),
-                            tab_address=symbol_asgn.get_address(),
-                            index_address=right_index_address,
-                            tab_offset=symbol_asgn.get_tab_offset()
-                        )
-                        
-                    elif(left_index == -1):
-                        left_index_address = get_symbol_address(last_read_symbols.pop())
-
-                        code_generator.store_unknown_value_by_unknown_index(
-                            left_symbol_address=symbol_asgn.get_real_tab_index_address(right_index),
-                            tab_address=symbol.get_address(),
-                            index_address=left_index_address,
-                            tab_offset=symbol.get_tab_offset()
-                        )
-                        
-                    elif(value == -1):
-                        code_generator.store_from_address_to_address(
-                                    symbol_asgn.get_real_tab_index_address(right_index),
-                                    symbol.get_real_tab_index_address(left_index)
-                        )
-                        symbol.set_tab_symbol_value_at_index(-1, left_index)
-
-                    else:
-                        code_generator.store_value_at_address(
-                                        value,
-                                        symbol.get_real_tab_index_address(left_index),
-                                        'a'
-                        )
-                        symbol.set_tab_symbol_value_at_index(value, left_index)
-                # tab(i) := variable
-                else:
-                    index = tab_indexes.pop()
-                    value = symbol_asgn.get_symbol_value()
-                    if(value == -1):
-                        if(index == -1):
-                            index_address = get_symbol_address(last_read_symbols.pop())
-
-                            code_generator.store_unknown_value_by_unknown_index(
-                                            left_symbol_address=symbol_asgn.get_address(),
-                                            tab_address=symbol.get_address(),
-                                            index_address=index_address,
-                                            tab_offset=symbol.get_tab_offset()
-                            )
-                        else:
-                            code_generator.store_from_address_to_address(
-                                            symbol_asgn.get_address(),
-                                            symbol.get_real_tab_index_address(index)
-                            )
-                            symbol.set_tab_symbol_value_at_index(-1, index)
-                    else:
-                        code_generator.store_value_at_address(
-                                        value,
-                                        symbol.get_real_tab_index_address(index),
-                                        'a'
-                        )
-                        symbol.set_tab_symbol_value_at_index(value, index)
-            # tab(i) := number
-            else:
-                index = tab_indexes.pop()
-                value = p[3]
-                if(index == -1):
-                    index_address = get_symbol_address(last_read_symbols.pop())
-                    code_generator.store_value_at_unknown_index(
-                                    left_value=value,
-                                    tab_address=symbol.get_address(),
-                                    index_address=index_address,
-                                    tab_offset=symbol.get_tab_offset()
-                    )
-                else:
-                    code_generator.store_value_at_address(
-                                    value,
-                                    symbol.get_real_tab_index_address(index),
-                                    'a'
-                    )
-
-                    symbol.set_tab_symbol_value_at_index(value, index)
-        else:
-            if(symbol_exists(p[3])):
-                symbol_asgn = get_symbol_by_name(p[3])
-
-                # variable = tab(i)
-                if(is_tab(p[3])):
-                    index = tab_indexes.pop()
-                    value = symbol_asgn.get_tab_symbol_value(index)
-                    if(index==-1):
-                        index_address = get_symbol_address(last_read_symbols.pop())
-                        code_generator.store_unknown_index_at_known_address(
-                            known_address=symbol.get_address(),
-                            tab_address=symbol_asgn.get_address(),
-                            index_address=index_address,
-                            tab_offset=symbol_asgn.get_tab_offset()
-                        )
-                        symbol.set_value(-1)
-                    elif(value == -1):
-                        code_generator.store_from_address_to_address(
-                            symbol_asgn.get_real_tab_index_address(index),
-                            symbol.get_address()
-                        )
-                        symbol.set_value(-1)
-                    else:
-                        code_generator.store_value_at_address(
-                                        value,
-                                        symbol.get_address(),
-                                        'a'
-                        )
-                        
-                        symbol.set_value(value)
-
-                # variable = variable
-                else:
-                    value = symbol_asgn.get_symbol_value()
-
-                    if(value == -1):
-                        code_generator.store_from_address_to_address(
-                            symbol_asgn.get_address(),
-                            symbol.get_address()
-                        )
-
-                    else:
-                        code_generator.store_value_at_address(
-                            value,
-                            symbol.get_address(),
-                            'a'
-                        )
-
-                    symbol.set_value(value)
-            # variable = number        
-            else:
-                value = p[3]
-                
-                code_generator.store_value_at_address(
-                    value,
-                    symbol.get_address(),
-                    'a'
-                )
-
-                symbol.set_value(value)
-
-        if(not get_symbol_by_name(p[1]).is_defined):
-            symbol.is_defined = True
+        left_is_var = False
+        right_is_var = False
         
+        if(get_symbol_by_name(p[1]) is not None):
+            left_is_var=True
+        if(get_symbol_by_name(p[3]) is not None):
+            right_is_var=True
+        
+        machine_values.append(p[1])
+        machine_values.append(p[3])
+        
+        left_symbol_address_flag, left_value_flag = -1, -1
+        right_symbol_address_flag, right_value_flag = -1, -1
+        
+        if(left_is_var):
+            left_symbol_address_flag = 0
+            if(right_is_var):
+                right_symbol_address_flag = 0
+            else:
+                right_value_flag = 0
+        else:
+            left_value_flag = 0
+            if(right_is_var):
+                right_symbol_address_flag = 0
+            else:
+                right_value_flag = 0
+        
+        pass_stacks_to_machine_controller()
+        
+        machine_controller.prepare_values_for_machine_task(
+            task='assignment',
+            left_symbol_address=left_symbol_address_flag,
+            left_value=left_value_flag,
+            right_symbol_address=right_symbol_address_flag,
+            right_value=right_value_flag
+        )
+        
+        update_stack_values()
 
 def p_command_for_down_to(p):
     'command : FOR  for_occured  pidentifier  get_pidentifier FROM  value first_value DOWNTO  value second_value DO do_occured commands  ENDFOR'
@@ -580,8 +444,7 @@ def p_command_do_occured(p):
         left_symbol = get_symbol_by_name(for_loop_borders[0])
         
         
-    machine_values.append(for_loop_borders[0])
-    machine_values.append(for_loop_borders[1])
+    machine_values=for_loop_borders
     left_symbol_address_flag, left_value_flag = -1, -1
     right_symbol_address_flag, right_value_flag = -1, -1
     
@@ -724,8 +587,7 @@ def p_command_write(p):
 
     elif(in_if_statement and not if_passes[-1]):
         return
-
-        
+  
     if(symbol_exists(p[2])):
         symbol = get_symbol_by_name(p[2])
         if symbol.is_tab:
@@ -1178,9 +1040,11 @@ for_loop_borders = []
 
 machine_math_manager = MachineMathManager(code_generator)
 machine_conditions_manager = MachineConditionsManager(code_generator)
+assignment_manager = AssignmentManager(code_generator)
 machine_controller = MachineController(
                         machine_math_manager=machine_math_manager,
                         machine_conditions_manager=machine_conditions_manager,
+                        assignment_manager=assignment_manager,
                         code_generator=code_generator
                         )
 
