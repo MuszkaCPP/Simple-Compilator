@@ -1,5 +1,4 @@
 from symbol import Symbol
-from register_manager import RegisterManager
 
 
 class CodeGenerator:
@@ -8,7 +7,6 @@ class CodeGenerator:
         self.generated_code = []
         self.address_for_machine_math = 0
         self.length_before_jump = []
-        self.register_manager = RegisterManager()
 
     # Math
     def process_math_operation(
