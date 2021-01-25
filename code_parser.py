@@ -240,10 +240,10 @@ def p_command_assignment(p):
 
     if (
         symbol_exists(p[3])
-        and get_symbol_by_name(p[3]).get_symbol_value() == 0
+        and get_symbol_by_name(p[3]).is_defined is not True
         and not get_symbol_by_name(p[3]).is_tab
     ):
-        throw_using_undeclared_error(p[3])
+        throw_using_undefined_error(p[3])
 
     if (
         symbol_exists(p[1])
@@ -405,7 +405,7 @@ def p_command_first_value(p):
 
     if symbol_exists(value):
         if get_symbol_by_name(value).is_defined is not True:
-            throw_using_undeclared_error(value)
+            throw_using_undefined_error(value)
         if get_symbol_by_name(value).is_iterator is True and len(in_for_loop) == 2:
             throw_wrong_symbol_usage_error(value)
 
@@ -421,7 +421,7 @@ def p_command_second_value(p):
 
     if symbol_exists(value):
         if get_symbol_by_name(value).is_defined is not True:
-            throw_using_undeclared_error(value)
+            throw_using_undefined_error(value)
         if get_symbol_by_name(value).is_iterator is True and len(in_for_loop) == 2:
             throw_wrong_symbol_usage_error(value)
 
@@ -606,9 +606,9 @@ def p_command_write(p):
     if (
         symbol_exists(p[2])
         and not get_symbol_by_name(p[2]).is_tab
-        and get_symbol_by_name(p[2]).get_symbol_value() == 0
+        and get_symbol_by_name(p[2]).is_defined is not True
     ):
-        throw_using_undeclared_error(p[2])
+        throw_using_undefined_error(p[2])
 
     global tab_indexes, last_read_symbols, in_if_statement, if_passes
 
@@ -1005,7 +1005,7 @@ def p_identifier(p):
         if not symbol_exists(p[3]):
             throw_undeclared_error(p[3])
         if get_symbol_by_name(p[3]).is_defined is not True:
-            throw_using_undeclared_error(p[3])
+            throw_using_undefined_error(p[3])
         if not get_symbol_by_name(p[1]).is_tab:
             throw_wrong_symbol_usage_error(p[1])
 
@@ -1041,8 +1041,8 @@ def throw_redeclare_error(value):
     exit(-1)
 
 
-def throw_using_undeclared_error(value):
-    print("[Error] Using undeclared symbol! [" + str(value) + "]")
+def throw_using_undefined_error(value):
+    print("[Error] Using undefined symbol! [" + str(value) + "]")
     exit(-1)
 
 
