@@ -29,4 +29,4 @@ if __name__ == "__main__":
     with open(output_file, "w") as file:
         file.writelines(code_generator.get_generated_code())
 
-    code_parser.print_all_symbols()
+    #code_parser.print_all_symbols()
