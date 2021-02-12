@@ -1,5 +1,6 @@
-import code_parser
 import sys
+
+import code_parser
 
 if __name__ == "__main__":
 
@@ -20,12 +21,12 @@ if __name__ == "__main__":
         print("[ERROR] Failed to initialize parser")
         exit(-1)
 
-    with open(input_file,'r') as file:
+    with open(input_file, "r") as file:
         for line in file:
             _input += line
 
     res = parser.parse(_input, tracking=True)
-    with open(output_file,'w') as file:
+    with open(output_file, "w") as file:
         file.writelines(code_generator.get_generated_code())
 
-    code_parser.print_all_symbols()
+    #code_parser.print_all_symbols()

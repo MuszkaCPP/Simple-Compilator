@@ -1,143 +1,142 @@
-
-class MachineConditionsManager():
+class MachineConditionsManager:
     def __init__(self, code_generator):
         self.code_generator = code_generator
 
-    def carry_out_condition(self, 
-                            condition = "",
-                            val_a=-1,
-                            address_a=-1,
-                            left_index_address=-1,
-                            left_offset=-1,
-                            val_b=-1,
-                            address_b=-1,
-                            right_index_address=-1,
-                            right_offset=-1
-                            ):
+    def carry_out_condition(
+        self,
+        condition="",
+        left_value=-1,
+        left_symbol_address=-1,
+        left_index_address=-1,
+        left_offset=-1,
+        right_value=-1,
+        right_symbol_address=-1,
+        right_index_address=-1,
+        right_offset=-1,
+    ):
 
-        if(address_a != -1
+        if (
+            left_symbol_address != -1
             and left_index_address != -1
-            and address_b != -1
+            and right_symbol_address != -1
             and right_index_address != -1
-            ):
+        ):
 
             self.code_generator.check_condition(
                 condition=condition,
-                address_a=address_a,
+                left_symbol_address=left_symbol_address,
                 left_index_address=left_index_address,
                 left_offset=left_offset,
-                address_b=address_b,
+                right_symbol_address=right_symbol_address,
                 right_index_address=right_index_address,
-                right_offset=right_offset
+                right_offset=right_offset,
             )
-        #tab(a) ? variable
-        elif(address_a != -1
+        # tab(a) ? variable
+        elif (
+            left_symbol_address != -1
             and left_index_address != -1
-            and address_b != -1
-            ):
+            and right_symbol_address != -1
+        ):
 
             self.code_generator.check_condition(
                 condition=condition,
-                address_a=address_a,
+                left_symbol_address=left_symbol_address,
                 left_index_address=left_index_address,
                 left_offset=left_offset,
-                address_b=address_b
+                right_symbol_address=right_symbol_address,
             )
-        #variable ? tab(a)
-        elif(address_a != -1
-            and address_b != -1
+        # variable ? tab(a)
+        elif (
+            left_symbol_address != -1
+            and right_symbol_address != -1
             and right_index_address != -1
-            ):
+        ):
 
-            if(condition=="=" or condition=="!="):
+            if condition == "=" or condition == "!=":
                 self.code_generator.check_condition(
                     condition=condition,
-                    address_b=address_a,
-                    address_a=address_b,
-                    left_index_address=right_index_address,
-                    left_offset=right_offset
-                )
-            else:
-                self.code_generator.check_condition(
-                    condition=condition,
-                    address_a=address_a,
-                    address_b=address_b,
-                    right_index_address=right_index_address,
-                    right_offset=right_offset
-                )
-        #tab(a) ? value
-        elif(address_a != -1 
-            and left_index_address != -1
-            and val_b != -1
-            ):
-            
-            self.code_generator.check_condition(
-                condition=condition,
-                address_a=address_a,
-                left_index_address=left_index_address,
-                left_offset=left_offset,
-                val_b=val_b
-            )
-        #value ? tab(a)
-        elif(val_a != -1
-            and address_b != -1 
-            and right_index_address != -1
-            ):
-            
-            if(condition=="=" or condition=="!="):
-                self.code_generator.check_condition(
-                    condition=condition,
-                    val_b=val_a,
-                    address_a=address_b,
+                    right_symbol_address=left_symbol_address,
+                    left_symbol_address=right_symbol_address,
                     left_index_address=right_index_address,
                     left_offset=right_offset,
                 )
             else:
                 self.code_generator.check_condition(
                     condition=condition,
-                    val_a=val_a,
-                    address_b=address_b,
+                    left_symbol_address=left_symbol_address,
+                    right_symbol_address=right_symbol_address,
                     right_index_address=right_index_address,
                     right_offset=right_offset,
                 )
-        #variable ? variable
-        elif(address_a != -1 and address_b != -1):
+        # tab(a) ? value
+        elif (
+            left_symbol_address != -1 and left_index_address != -1 and right_value != -1
+        ):
+
             self.code_generator.check_condition(
                 condition=condition,
-                address_a=address_a,
-                address_b=address_b
+                left_symbol_address=left_symbol_address,
+                left_index_address=left_index_address,
+                left_offset=left_offset,
+                right_value=right_value,
             )
-        #variable ? value
-        elif(address_a != -1 and val_b != -1):
-            self.code_generator.check_condition(
-                condition=condition,
-                address_a=address_a,
-                val_b=val_b
-            )
-        #value ? variable
-        elif(val_a != -1 and address_b != -1):
-            if(condition=="=" or condition=="!="):
+        # value ? tab(a)
+        elif (
+            left_value != -1
+            and right_symbol_address != -1
+            and right_index_address != -1
+        ):
+
+            if condition == "=" or condition == "!=":
                 self.code_generator.check_condition(
                     condition=condition,
-                    address_a=address_b,
-                    val_b=val_a
+                    right_value=left_value,
+                    left_symbol_address=right_symbol_address,
+                    left_index_address=right_index_address,
+                    left_offset=right_offset,
                 )
             else:
                 self.code_generator.check_condition(
                     condition=condition,
-                    val_a=val_a,
-                    address_b=address_b
+                    left_value=left_value,
+                    right_symbol_address=right_symbol_address,
+                    right_index_address=right_index_address,
+                    right_offset=right_offset,
                 )
-        elif(val_a != -1 and val_b != -1):
-            if(condition=="=" or condition=="!="):
+        # variable ? variable
+        elif left_symbol_address != -1 and right_symbol_address != -1:
+            self.code_generator.check_condition(
+                condition=condition,
+                left_symbol_address=left_symbol_address,
+                right_symbol_address=right_symbol_address,
+            )
+        # variable ? value
+        elif left_symbol_address != -1 and right_value != -1:
+            self.code_generator.check_condition(
+                condition=condition,
+                left_symbol_address=left_symbol_address,
+                right_value=right_value,
+            )
+        # value ? variable
+        elif left_value != -1 and right_symbol_address != -1:
+            if condition == "=" or condition == "!=":
                 self.code_generator.check_condition(
                     condition=condition,
-                    val_a=val_b,
-                    val_b=val_a
+                    left_symbol_address=right_symbol_address,
+                    right_value=left_value,
                 )
             else:
                 self.code_generator.check_condition(
                     condition=condition,
-                    val_a=val_a,
-                    val_b=val_b
+                    left_value=left_value,
+                    right_symbol_address=right_symbol_address,
+                )
+        elif left_value != -1 and right_value != -1:
+            if condition == "=" or condition == "!=":
+                self.code_generator.check_condition(
+                    condition=condition, left_value=right_value, right_value=left_value
+                )
+            else:
+                self.code_generator.check_condition(
+                    condition=condition, left_value=left_value, right_value=right_value
                 )
